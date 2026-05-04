@@ -574,7 +574,7 @@
 /* =================================================================
    CONFIG — REPLACE THIS ONE LINE WITH YOUR JSONBIN MASTER KEY
    ================================================================= */
-const JSONBIN_KEY = "YOUR_JSONBIN_KEY_HERE";
+const JSONBIN_KEY = "$2a$10$JpUUVKnjrpe4tdYuf7hCg.BjgGDPkR0t3rTUB.fygc6MHgA2k9MZ6";
 
 /* =================================================================
    STATE
