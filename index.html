@@ -163,7 +163,7 @@
     gap: 8px;
     margin-top: auto;
   }
-  input[type="text"] {
+  input[type="text"], textarea {
     width: 100%;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -172,14 +172,39 @@
     border-radius: 10px;
     font-family: inherit;
     font-size: 14px;
+    line-height: 1.5;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
-  input[type="text"]:focus {
+  textarea {
+    resize: vertical;
+    min-height: 96px;
+    max-height: 240px;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-soft);
   }
-  input[type="text"]:disabled { opacity: 0.5; background: var(--bg-soft); }
+  input[type="text"]:disabled, textarea:disabled { opacity: 0.5; background: var(--bg-soft); cursor: not-allowed; }
+  .input-hint {
+    font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: -4px;
+    letter-spacing: 0.04em;
+  }
+  .input-hint kbd {
+    display: inline-block;
+    padding: 1px 5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 10px;
+    color: var(--text-2);
+    margin: 0 1px;
+  }
   button.gen {
     width: 100%;
     background: var(--primary);
@@ -436,7 +461,8 @@
 
         <form id="form">
           <div class="label">Prompt</div>
-          <input type="text" id="prompt" placeholder="Describe your image..." autocomplete="off" />
+          <textarea id="prompt" rows="4" placeholder="Describe your image — long descriptive prompts work best. Include style, lighting, composition, mood..."></textarea>
+          <div class="input-hint"><kbd>⌘</kbd>+<kbd>Enter</kbd> to generate · <kbd>Enter</kbd> for new line</div>
           <button type="submit" class="gen" id="genBtn">Generate</button>
         </form>
       </aside>
@@ -517,8 +543,24 @@
     const chip = e.target.closest('.chip');
     if (!chip) return;
     promptInput.value = chip.dataset.prompt;
+    autoResizePrompt();
     promptInput.focus();
     promptInput.setSelectionRange(promptInput.value.length, promptInput.value.length);
+  });
+
+  // Auto-grow textarea up to its max-height (CSS), then scroll
+  function autoResizePrompt() {
+    promptInput.style.height = 'auto';
+    promptInput.style.height = Math.min(promptInput.scrollHeight, 240) + 'px';
+  }
+  promptInput.addEventListener('input', autoResizePrompt);
+
+  // Cmd/Ctrl+Enter submits; plain Enter inserts newline
+  promptInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      form.requestSubmit();
+    }
   });
 
   function getPassword() { return localStorage.getItem('nimbus_token') || ''; }
