@@ -532,6 +532,9 @@
         <button class="opt" data-model="cloudflare-flux">
           FLUX schnell <span class="opt-meta">200/day</span>
         </button>
+        <button class="opt" data-model="kling">
+          Kling <span class="opt-meta">v2 · paid</span>
+        </button>
       </div>
     </header>
 
@@ -611,7 +614,7 @@
   const pwError = document.getElementById('pwError');
   const pwCancel = document.getElementById('pwCancel');
 
-  const VALID_MODELS = ['pollinations', 'cloudflare-flux'];
+  const VALID_MODELS = ['pollinations', 'cloudflare-flux', 'kling'];
   let model = localStorage.getItem('nimbus_model') || 'pollinations';
   if (!VALID_MODELS.includes(model)) {
     model = 'pollinations';
@@ -801,13 +804,77 @@
     return genFromFunction('/.netlify/functions/cloudflare-flux', prompt);
   }
 
+  // Kling is async — submit task, poll for result
+  async function genKling(prompt) {
+    let token = getPassword();
+
+    async function attemptCreate(authToken) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+      return fetch('/.netlify/functions/kling-image-create', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ prompt }),
+      });
+    }
+
+    let r = await attemptCreate(token);
+    if (r.status === 401) {
+      localStorage.removeItem('nimbus_token');
+      token = await askPassword();
+      if (!token) throw new Error('Password chahiye Kling ke liye.');
+      r = await attemptCreate(token);
+      if (r.status === 401) throw new Error('Wrong password.');
+      localStorage.setItem('nimbus_token', token);
+    }
+
+    const created = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      throw new Error((created.error || 'Kling create failed') + (created.detail ? ' — ' + created.detail : ''));
+    }
+    if (!created.task_id) {
+      throw new Error('No task_id from Kling.');
+    }
+
+    // Poll up to 90s
+    const taskId = created.task_id;
+    const pollHeaders = {};
+    if (token) pollHeaders['Authorization'] = 'Bearer ' + token;
+    const start = Date.now();
+    const TIMEOUT = 90 * 1000;
+
+    while (Date.now() - start < TIMEOUT) {
+      await new Promise((res) => setTimeout(res, 3500));
+      const sr = await fetch('/.netlify/functions/kling-image-status?task_id=' + encodeURIComponent(taskId), {
+        headers: pollHeaders,
+      });
+      const status = await sr.json().catch(() => ({}));
+      if (!sr.ok) {
+        throw new Error((status.error || 'Status check failed') + (status.detail ? ' — ' + status.detail : ''));
+      }
+      const ts = status.task_status;
+      if (ts === 'succeed') {
+        const url = status.images?.[0]?.url;
+        if (!url) throw new Error('Kling succeeded but no image URL.');
+        return { url, mimeType: 'image/png' };
+      }
+      if (ts === 'failed') {
+        throw new Error('Kling generation failed: ' + (status.task_status_msg || 'no detail'));
+      }
+      // submitted | processing — keep polling
+    }
+    throw new Error('Kling timed out after 90s.');
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const prompt = promptInput.value.trim();
     if (!prompt) return;
 
     currentPrompt = prompt;
-    currentLabel = model === 'cloudflare-flux' ? 'FLUX' : 'POLLINATIONS';
+    currentLabel = model === 'cloudflare-flux' ? 'FLUX'
+                  : model === 'kling' ? 'KLING'
+                  : 'POLLINATIONS';
 
     genBtn.disabled = true;
     promptInput.disabled = true;
@@ -815,13 +882,19 @@
     result.classList.remove('empty');
     const renderText = model === 'cloudflare-flux'
       ? 'FLUX schnell on Cloudflare · 3-8s'
+      : model === 'kling'
+      ? 'Kling v2 · async · usually 20-45s'
       : 'Pollinations FLUX · 5-15s';
     result.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">${renderText}</div></div>`;
     meta.classList.add('hidden');
     hideTweakBar();
 
     try {
-      const { url } = model === 'cloudflare-flux' ? await genCloudflareFlux(prompt) : await genPollinations(prompt);
+      const { url } = model === 'cloudflare-flux'
+        ? await genCloudflareFlux(prompt)
+        : model === 'kling'
+        ? await genKling(prompt)
+        : await genPollinations(prompt);
       currentImageUrl = url;
       const img = new Image();
       img.onload = () => {
