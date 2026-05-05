@@ -323,8 +323,8 @@
       <button class="model-opt active" data-model="pollinations">
         Pollinations <span class="model-meta">free · instant</span>
       </button>
-      <button class="model-opt premium" data-model="nano-banana">
-        Nano Banana <span class="model-meta">free 500/day</span>
+      <button class="model-opt premium" data-model="cloudflare-flux">
+        FLUX schnell <span class="model-meta">cf · free 200/day</span>
       </button>
     </div>
 
@@ -392,7 +392,12 @@
   const pwCancel = document.getElementById('pwCancel');
 
   // Selected model — persist in localStorage
+  const VALID_MODELS = ['pollinations', 'cloudflare-flux'];
   let model = localStorage.getItem('nimbus_model') || 'pollinations';
+  if (!VALID_MODELS.includes(model)) {
+    model = 'pollinations';
+    localStorage.setItem('nimbus_model', model);
+  }
   syncModelUI();
 
   let currentImageUrl = null;
@@ -403,7 +408,7 @@
     document.querySelectorAll('.model-opt').forEach((b) => {
       b.classList.toggle('active', b.dataset.model === model);
     });
-    if (model === 'nano-banana') {
+    if (model === 'cloudflare-flux') {
       genBtn.classList.add('premium');
     } else {
       genBtn.classList.remove('premium');
@@ -472,28 +477,27 @@
     });
   }
 
-  async function callNanoBanana(prompt, token) {
+  async function callBackend(endpoint, prompt, token) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    return fetch('/.netlify/functions/nano-banana', {
+    return fetch(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify({ prompt }),
     });
   }
 
-  async function genNanoBanana(prompt) {
+  async function genFromFunction(endpoint, prompt) {
     // First attempt — use stored token if any, else no auth header.
     // The server only enforces auth if DASHBOARD_PASSWORD env var is set.
     let token = getPassword();
-    let r = await callNanoBanana(prompt, token);
+    let r = await callBackend(endpoint, prompt, token);
 
-    // 401 means server has password set and we need to ask user
     if (r.status === 401) {
       localStorage.removeItem('nimbus_token');
       token = await askPassword();
-      if (!token) throw new Error('Password chahiye Nano Banana ke liye.');
-      r = await callNanoBanana(prompt, token);
+      if (!token) throw new Error('Password chahiye is mode ke liye.');
+      r = await callBackend(endpoint, prompt, token);
       if (r.status === 401) {
         throw new Error('Wrong password.');
       }
@@ -508,9 +512,13 @@
       throw new Error('No image returned. ' + (data.textOutput || ''));
     }
     return {
-      url: `data:${data.mimeType || 'image/png'};base64,${data.image}`,
-      mimeType: data.mimeType || 'image/png',
+      url: `data:${data.mimeType || 'image/jpeg'};base64,${data.image}`,
+      mimeType: data.mimeType || 'image/jpeg',
     };
+  }
+
+  async function genCloudflareFlux(prompt) {
+    return genFromFunction('/.netlify/functions/cloudflare-flux', prompt);
   }
 
   form.addEventListener('submit', async (e) => {
@@ -519,20 +527,20 @@
     if (!prompt) return;
 
     currentPrompt = prompt;
-    currentLabel = model === 'nano-banana' ? 'Nano Banana' : 'FLUX';
+    currentLabel = model === 'cloudflare-flux' ? 'FLUX schnell' : 'Pollinations';
 
     genBtn.disabled = true;
     promptInput.disabled = true;
     genBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span>Generating';
     result.classList.remove('empty');
-    const renderText = model === 'nano-banana'
-      ? 'Nano Banana rendering · Gemini 2.5 Flash · usually 5-12s'
-      : 'FLUX rendering · usually 5-15s';
+    const renderText = model === 'cloudflare-flux'
+      ? 'FLUX schnell on Cloudflare · usually 3-8s'
+      : 'FLUX rendering on Pollinations · usually 5-15s';
     result.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">${renderText}</div></div>`;
     meta.style.display = 'none';
 
     try {
-      const { url } = model === 'nano-banana' ? await genNanoBanana(prompt) : await genPollinations(prompt);
+      const { url } = model === 'cloudflare-flux' ? await genCloudflareFlux(prompt) : await genPollinations(prompt);
       currentImageUrl = url;
       const img = new Image();
       img.onload = () => {
@@ -540,7 +548,7 @@
         result.appendChild(img);
         lastPromptEl.textContent = prompt;
         metaTag.textContent = currentLabel;
-        metaTag.classList.toggle('premium', model === 'nano-banana');
+        metaTag.classList.toggle('premium', model === 'cloudflare-flux');
         meta.style.display = 'flex';
       };
       img.onerror = () => {
