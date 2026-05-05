@@ -5,54 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Nimbus marketing · image gen</title>
 <style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-2: #475569;
+    --text-3: #94a3b8;
+    --primary: #1e40af;
+    --primary-hover: #1e3a8a;
+    --primary-soft: #dbeafe;
+    --primary-2: #0ea5e9;
+    --danger: #dc2626;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
+    --shadow-md: 0 4px 12px rgba(15,23,42,0.08);
+    --shadow-lg: 0 12px 28px rgba(15,23,42,0.10);
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0e0d0b;
-    color: #f4ede0;
-    min-height: 100vh;
-    padding: 32px 20px 64px;
-  }
-  .stack {
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-  .brand { text-align: center; margin-top: 6vh; line-height: 0.9; }
-  .brand-1 {
-    font-size: clamp(48px, 9vw, 84px);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    color: #f4ede0;
-  }
-  .brand-2 {
-    font-size: clamp(20px, 3.2vw, 30px);
-    font-weight: 300;
-    font-style: italic;
-    letter-spacing: -0.01em;
-    color: #b3ab9b;
-    margin-top: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    overflow: hidden; /* desktop: no body scroll */
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Model switcher */
-  .model-switcher {
-    display: inline-flex;
-    background: #161513;
-    border: 1px solid #2e2d2a;
-    border-radius: 999px;
-    padding: 4px;
-    gap: 4px;
+  /* ============ APP SHELL ============ */
+  .app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
-  .model-opt {
-    padding: 8px 16px;
+
+  /* ============ TOPBAR ============ */
+  .topbar {
+    flex: 0 0 auto;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    gap: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .brand-1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--primary);
+  }
+  .brand-2 {
+    font-size: 14px;
+    color: var(--text-2);
+    font-weight: 400;
+  }
+  .brand-2::before { content: '/ '; color: var(--text-3); margin-right: 2px; }
+
+  .switcher {
+    display: inline-flex;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .opt {
+    padding: 7px 14px;
     border: none;
     background: transparent;
-    color: #6b6558;
+    color: var(--text-2);
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
@@ -62,197 +94,239 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
   }
-  .model-opt:hover { color: #b3ab9b; }
-  .model-opt.active {
-    background: #ff5e1f;
-    color: #1a0a00;
+  .opt:hover { color: var(--text); }
+  .opt.active {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
   }
-  .model-opt.active.premium {
-    background: #ffb800;
-  }
-  .model-meta {
+  .opt-meta {
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
     font-size: 10px;
     opacity: 0.7;
-    font-weight: 400;
+    font-weight: 500;
   }
-  .model-opt.active .model-meta { opacity: 0.7; }
 
-  /* Prompt chips */
-  .suggestions {
-    width: 100%;
+  /* ============ MAIN GRID ============ */
+  .grid {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    min-height: 0;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    background: var(--bg-soft);
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 4px;
+    gap: 18px;
+    min-height: 0;
+    overflow-y: auto;
   }
-  .suggestions-label {
+  .label {
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #6b6558;
+    color: var(--text-3);
+    margin-bottom: 8px;
   }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
-    background: #1c1b18;
-    color: #b3ab9b;
-    border: 1px solid #2e2d2a;
-    padding: 8px 14px;
+    background: var(--surface);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    padding: 7px 12px;
     border-radius: 999px;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
   }
-  .chip:hover { background: #232220; border-color: #ff5e1f; color: #f4ede0; }
+  .chip:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
   .chip:active { transform: translateY(1px); }
 
   /* Form */
-  form { width: 100%; display: flex; gap: 8px; margin-top: 4px; }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+  }
   input[type="text"] {
-    flex: 1;
-    background: #1c1b18;
-    border: 1px solid #2e2d2a;
-    color: #f4ede0;
-    padding: 16px 18px;
-    border-radius: 14px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
     font-family: inherit;
-    font-size: 16px;
+    font-size: 14px;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
   input[type="text"]:focus {
     outline: none;
-    border-color: #ff5e1f;
-    box-shadow: 0 0 0 4px rgba(255,94,31,0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
   }
-  input[type="text"]:disabled { opacity: 0.5; }
+  input[type="text"]:disabled { opacity: 0.5; background: var(--bg-soft); }
   button.gen {
-    background: #ff5e1f;
-    color: #1a0a00;
+    width: 100%;
+    background: var(--primary);
+    color: #ffffff;
     border: none;
-    padding: 16px 22px;
-    border-radius: 14px;
+    padding: 12px 18px;
+    border-radius: 10px;
     font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.15s, opacity 0.15s;
-    box-shadow: 0 8px 24px rgba(255,94,31,0.25);
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: var(--shadow-md);
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
   }
-  button.gen.premium { background: #ffb800; box-shadow: 0 8px 24px rgba(255,184,0,0.25); }
-  button.gen:hover:not(:disabled) { transform: translateY(-2px); }
-  button.gen:active:not(:disabled) { transform: translateY(0); }
+  button.gen:hover:not(:disabled) { background: var(--primary-hover); }
+  button.gen:active:not(:disabled) { transform: translateY(1px); }
   button.gen:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
 
-  /* Result */
+  /* ============ CANVAS ============ */
+  .canvas {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    background: var(--bg);
+  }
   .result {
-    width: 100%;
-    min-height: 200px;
-    margin-top: 4px;
-    border-radius: 18px;
-    background: #161513;
-    border: 1px solid #2e2d2a;
-    overflow: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     position: relative;
   }
   .result.empty::before {
-    content: 'Image yahan dikhega';
-    color: #4a4640;
+    content: 'Image yahan dikhega \2014  prompt likh ya chip pakad';
+    color: var(--text-3);
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
-    font-size: 13px;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    letter-spacing: 0.04em;
   }
-  .result img { display: block; width: 100%; height: auto; }
+  .result img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
   .loading {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 60px 20px;
+    gap: 12px;
+    padding: 40px;
   }
   .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid #2e2d2a;
-    border-top-color: #ff5e1f;
+    width: 28px; height: 28px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text {
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #6b6558;
+    color: var(--text-3);
     text-align: center;
-    max-width: 360px;
   }
   .error {
-    padding: 28px 24px;
+    padding: 24px;
     text-align: center;
-    color: #f87171;
-    font-size: 14px;
+    color: var(--danger);
+    font-size: 13px;
     line-height: 1.5;
     word-break: break-word;
+    max-width: 480px;
   }
+
+  /* Meta footer */
   .meta {
-    width: 100%;
+    flex: 0 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-height: 44px;
   }
+  .meta:empty, .meta.hidden { display: none; }
   .meta-prompt {
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
-    font-size: 12px;
-    color: #b3ab9b;
+    font-size: 11px;
+    color: var(--text-2);
     flex: 1;
     min-width: 0;
     word-break: break-word;
+    line-height: 1.4;
   }
-  .meta-prompt span { color: #6b6558; margin-right: 6px; }
   .meta-tag {
-    background: #232220;
-    color: #ff5e1f;
+    background: var(--primary-soft);
+    color: var(--primary);
     padding: 2px 8px;
-    border-radius: 6px;
+    border-radius: 5px;
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
     font-size: 10px;
-    letter-spacing: 0.08em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     margin-right: 8px;
   }
-  .meta-tag.premium { color: #ffb800; }
   .download-btn {
-    background: #1c1b18;
-    color: #f4ede0;
-    border: 1px solid #2e2d2a;
-    padding: 8px 14px;
-    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 8px;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
-    text-decoration: none;
     transition: all 0.15s;
     white-space: nowrap;
   }
-  .download-btn:hover { background: #2e2d2a; border-color: #3d3b37; }
+  .download-btn:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 
   /* Password modal */
   .pw-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.72);
-    backdrop-filter: blur(8px);
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px);
     z-index: 50;
     display: none;
     align-items: center;
@@ -261,107 +335,129 @@
   }
   .pw-overlay.show { display: flex; }
   .pw-card {
-    background: #1c1b18;
-    border: 1px solid #2e2d2a;
-    border-radius: 18px;
-    padding: 28px;
-    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 360px;
     width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow-lg);
   }
-  .pw-card h3 {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-  .pw-card p {
-    color: #b3ab9b;
-    font-size: 13px;
-    margin-bottom: 18px;
-    line-height: 1.5;
-  }
-  .pw-card form { display: flex; flex-direction: column; gap: 10px; }
+  .pw-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .pw-card p { color: var(--text-2); font-size: 12px; margin-bottom: 14px; }
   .pw-card input {
     width: 100%;
-    padding: 14px 16px;
-    background: #0e0d0b;
-    border: 1px solid #2e2d2a;
-    border-radius: 12px;
-    color: #f4ede0;
-    font-family: inherit;
-    font-size: 15px;
-  }
-  .pw-card input:focus { outline: none; border-color: #ff5e1f; box-shadow: 0 0 0 3px rgba(255,94,31,0.15); }
-  .pw-card .pw-actions { display: flex; gap: 8px; }
-  .pw-card button {
-    flex: 1;
-    padding: 13px;
-    border: none;
-    border-radius: 12px;
+    padding: 11px 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
     font-family: inherit;
     font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .pw-card .pw-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .pw-card button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
   }
-  .pw-card button.primary { background: #ff5e1f; color: #1a0a00; }
-  .pw-card button.ghost { background: #232220; color: #b3ab9b; border: 1px solid #2e2d2a; }
-  .pw-error {
-    color: #f87171;
-    font-size: 12px;
-    min-height: 16px;
+  .pw-card button.primary { background: var(--primary); color: #fff; }
+  .pw-card button.ghost { background: var(--bg-soft); color: var(--text-2); border: 1px solid var(--border); }
+  .pw-error { color: var(--danger); font-size: 11px; min-height: 14px; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 880px) {
+    body { overflow: auto; }
+    .app { height: auto; min-height: 100vh; }
+    .topbar {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 12px 16px;
+      gap: 10px;
+    }
+    .grid {
+      grid-template-columns: 1fr;
+      flex: none;
+    }
+    .sidebar {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: visible;
+    }
+    .canvas { padding: 16px; }
+    .result { aspect-ratio: 1 / 1; min-height: 280px; }
+    form { margin-top: 8px; }
+  }
+  @media (max-width: 480px) {
+    .opt { padding: 6px 10px; font-size: 12px; }
+    .opt-meta { display: none; }
   }
 </style>
 </head>
 <body>
-  <div class="stack">
-    <div class="brand">
-      <div class="brand-1">Nimbus</div>
-      <div class="brand-2">marketing</div>
-    </div>
-
-    <div class="model-switcher" role="radiogroup" aria-label="Model">
-      <button class="model-opt active" data-model="pollinations">
-        Pollinations <span class="model-meta">free · instant</span>
-      </button>
-      <button class="model-opt premium" data-model="cloudflare-flux">
-        FLUX schnell <span class="model-meta">cf · free 200/day</span>
-      </button>
-    </div>
-
-    <div class="suggestions">
-      <div class="suggestions-label">▸ try a logistics prompt</div>
-      <div class="chips" id="chips">
-        <button class="chip" data-prompt="delivery rider on motorcycle in Indian street at golden hour, branded helmet, motion blur, cinematic photography, ultra detailed">delivery rider · golden hour</button>
-        <button class="chip" data-prompt="festive Diwali sale banner for ecommerce shipping brand, gift boxes with diyas, vibrant colors, modern Indian aesthetic, hero composition">diwali sale banner</button>
-        <button class="chip" data-prompt="premium cardboard shipping package with branded label and twine, soft studio lighting, minimalist product photography, clean white backdrop">premium packaging shot</button>
-        <button class="chip" data-prompt="modern automated warehouse interior with conveyor belts and stacked packages, cool blue ambient lighting, wide angle, photorealistic">automated warehouse</button>
-        <button class="chip" data-prompt="courier rider zooming through monsoon rain in Mumbai street, water splashes, dramatic atmosphere, cinematic photography, motion">monsoon courier</button>
-        <button class="chip" data-prompt="freight truck on highway at sunset, golden hour, motion blur, India national highway, wide cinematic shot, atmospheric">freight truck · highway</button>
-        <button class="chip" data-prompt="eco-friendly kraft paper shipping box with green ribbon and leaves, sustainability concept, soft natural light, editorial product photography">eco-friendly packaging</button>
-        <button class="chip" data-prompt="same-day delivery hero banner, fast motion blur, package being handed over, energetic, bold typography space, modern ecommerce">same-day delivery hero</button>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-1">Nimbus</span>
+        <span class="brand-2">marketing</span>
       </div>
-    </div>
-
-    <form id="form">
-      <input type="text" id="prompt" placeholder="Describe the image — or pick a chip above" autocomplete="off" />
-      <button type="submit" class="gen" id="genBtn">Generate</button>
-    </form>
-
-    <div class="result empty" id="result"></div>
-    <div class="meta" id="meta" style="display:none;">
-      <div class="meta-prompt">
-        <span class="meta-tag" id="metaTag">FLUX</span>
-        <span>prompt:</span><span id="lastPrompt"></span>
+      <div class="switcher" role="radiogroup" aria-label="Model">
+        <button class="opt active" data-model="pollinations">
+          Pollinations <span class="opt-meta">free</span>
+        </button>
+        <button class="opt" data-model="cloudflare-flux">
+          FLUX schnell <span class="opt-meta">200/day</span>
+        </button>
       </div>
-      <button class="download-btn" id="downloadBtn">↓ Download</button>
-    </div>
+    </header>
+
+    <main class="grid">
+      <aside class="sidebar">
+        <div>
+          <div class="label">Logistics prompts</div>
+          <div class="chips" id="chips">
+            <button class="chip" data-prompt="delivery rider on motorcycle in Indian street at golden hour, branded helmet, motion blur, cinematic photography, ultra detailed">delivery rider</button>
+            <button class="chip" data-prompt="festive Diwali sale banner for ecommerce shipping brand, gift boxes with diyas, vibrant colors, modern Indian aesthetic, hero composition">diwali sale</button>
+            <button class="chip" data-prompt="premium cardboard shipping package with branded label and twine, soft studio lighting, minimalist product photography, clean white backdrop">premium packaging</button>
+            <button class="chip" data-prompt="modern automated warehouse interior with conveyor belts and stacked packages, cool blue ambient lighting, wide angle, photorealistic">warehouse</button>
+            <button class="chip" data-prompt="courier rider zooming through monsoon rain in Mumbai street, water splashes, dramatic atmosphere, cinematic photography, motion">monsoon courier</button>
+            <button class="chip" data-prompt="freight truck on highway at sunset, golden hour, motion blur, India national highway, wide cinematic shot, atmospheric">freight truck</button>
+            <button class="chip" data-prompt="eco-friendly kraft paper shipping box with green ribbon and leaves, sustainability concept, soft natural light, editorial product photography">eco packaging</button>
+            <button class="chip" data-prompt="same-day delivery hero banner, fast motion blur, package being handed over, energetic, bold typography space, modern ecommerce">same-day hero</button>
+          </div>
+        </div>
+
+        <form id="form">
+          <div class="label">Prompt</div>
+          <input type="text" id="prompt" placeholder="Describe your image..." autocomplete="off" />
+          <button type="submit" class="gen" id="genBtn">Generate</button>
+        </form>
+      </aside>
+
+      <section class="canvas">
+        <div class="result empty" id="result"></div>
+        <div class="meta hidden" id="meta">
+          <div class="meta-prompt">
+            <span class="meta-tag" id="metaTag">FLUX</span>
+            <span id="lastPrompt"></span>
+          </div>
+          <button class="download-btn" id="downloadBtn">↓ Download</button>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- Password modal for Nano Banana -->
   <div class="pw-overlay" id="pwOverlay">
     <div class="pw-card">
       <h3>Dashboard password</h3>
-      <p>Nano Banana use karne ke liye one-time password chahiye (browser me save ho jayega).</p>
+      <p>Server has auth enabled — enter password (saved in this browser).</p>
       <form id="pwForm">
         <input type="password" id="pwInput" placeholder="password" autocomplete="off" />
         <div class="pw-error" id="pwError"></div>
@@ -384,14 +480,13 @@
   const metaTag = document.getElementById('metaTag');
   const downloadBtn = document.getElementById('downloadBtn');
   const chips = document.getElementById('chips');
-  const switcher = document.querySelector('.model-switcher');
+  const switcher = document.querySelector('.switcher');
   const pwOverlay = document.getElementById('pwOverlay');
   const pwForm = document.getElementById('pwForm');
   const pwInput = document.getElementById('pwInput');
   const pwError = document.getElementById('pwError');
   const pwCancel = document.getElementById('pwCancel');
 
-  // Selected model — persist in localStorage
   const VALID_MODELS = ['pollinations', 'cloudflare-flux'];
   let model = localStorage.getItem('nimbus_model') || 'pollinations';
   if (!VALID_MODELS.includes(model)) {
@@ -405,18 +500,13 @@
   let currentLabel = '';
 
   function syncModelUI() {
-    document.querySelectorAll('.model-opt').forEach((b) => {
+    document.querySelectorAll('.opt').forEach((b) => {
       b.classList.toggle('active', b.dataset.model === model);
     });
-    if (model === 'cloudflare-flux') {
-      genBtn.classList.add('premium');
-    } else {
-      genBtn.classList.remove('premium');
-    }
   }
 
   switcher.addEventListener('click', (e) => {
-    const btn = e.target.closest('.model-opt');
+    const btn = e.target.closest('.opt');
     if (!btn) return;
     model = btn.dataset.model;
     localStorage.setItem('nimbus_model', model);
@@ -431,17 +521,13 @@
     promptInput.setSelectionRange(promptInput.value.length, promptInput.value.length);
   });
 
-  // Password gate
-  function getPassword() {
-    return localStorage.getItem('nimbus_token') || '';
-  }
+  function getPassword() { return localStorage.getItem('nimbus_token') || ''; }
   function askPassword() {
     return new Promise((resolve) => {
       pwError.textContent = '';
       pwInput.value = '';
       pwOverlay.classList.add('show');
       setTimeout(() => pwInput.focus(), 50);
-
       const onSubmit = (e) => {
         e.preventDefault();
         const v = pwInput.value.trim();
@@ -450,11 +536,7 @@
         pwOverlay.classList.remove('show');
         resolve(v);
       };
-      const onCancel = () => {
-        cleanup();
-        pwOverlay.classList.remove('show');
-        resolve(null);
-      };
+      const onCancel = () => { cleanup(); pwOverlay.classList.remove('show'); resolve(null); };
       function cleanup() {
         pwForm.removeEventListener('submit', onSubmit);
         pwCancel.removeEventListener('click', onCancel);
@@ -464,7 +546,6 @@
     });
   }
 
-  // Generation flows
   async function genPollinations(prompt) {
     const seed = Math.floor(Math.random() * 1000000);
     const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&nologo=true&model=flux`;
@@ -488,29 +569,19 @@
   }
 
   async function genFromFunction(endpoint, prompt) {
-    // First attempt — use stored token if any, else no auth header.
-    // The server only enforces auth if DASHBOARD_PASSWORD env var is set.
     let token = getPassword();
     let r = await callBackend(endpoint, prompt, token);
-
     if (r.status === 401) {
       localStorage.removeItem('nimbus_token');
       token = await askPassword();
       if (!token) throw new Error('Password chahiye is mode ke liye.');
       r = await callBackend(endpoint, prompt, token);
-      if (r.status === 401) {
-        throw new Error('Wrong password.');
-      }
+      if (r.status === 401) throw new Error('Wrong password.');
       localStorage.setItem('nimbus_token', token);
     }
-
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      throw new Error((data.error || 'Request failed') + (data.detail ? ' — ' + data.detail : ''));
-    }
-    if (!data.image) {
-      throw new Error('No image returned. ' + (data.textOutput || ''));
-    }
+    if (!r.ok) throw new Error((data.error || 'Request failed') + (data.detail ? ' — ' + data.detail : ''));
+    if (!data.image) throw new Error('No image returned.');
     return {
       url: `data:${data.mimeType || 'image/jpeg'};base64,${data.image}`,
       mimeType: data.mimeType || 'image/jpeg',
@@ -527,17 +598,17 @@
     if (!prompt) return;
 
     currentPrompt = prompt;
-    currentLabel = model === 'cloudflare-flux' ? 'FLUX schnell' : 'Pollinations';
+    currentLabel = model === 'cloudflare-flux' ? 'FLUX' : 'POLLINATIONS';
 
     genBtn.disabled = true;
     promptInput.disabled = true;
-    genBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span>Generating';
+    genBtn.innerHTML = '<span class="spinner" style="width:13px;height:13px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:#fff;"></span>Generating';
     result.classList.remove('empty');
     const renderText = model === 'cloudflare-flux'
-      ? 'FLUX schnell on Cloudflare · usually 3-8s'
-      : 'FLUX rendering on Pollinations · usually 5-15s';
+      ? 'FLUX schnell on Cloudflare · 3-8s'
+      : 'Pollinations FLUX · 5-15s';
     result.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">${renderText}</div></div>`;
-    meta.style.display = 'none';
+    meta.classList.add('hidden');
 
     try {
       const { url } = model === 'cloudflare-flux' ? await genCloudflareFlux(prompt) : await genPollinations(prompt);
@@ -548,8 +619,7 @@
         result.appendChild(img);
         lastPromptEl.textContent = prompt;
         metaTag.textContent = currentLabel;
-        metaTag.classList.toggle('premium', model === 'cloudflare-flux');
-        meta.style.display = 'flex';
+        meta.classList.remove('hidden');
       };
       img.onerror = () => {
         result.innerHTML = '<div class="error">Image load nahi hui. Try again.</div>';
@@ -570,9 +640,7 @@
     try {
       let blob;
       if (currentImageUrl.startsWith('data:')) {
-        // base64 data URL — convert directly
-        const res = await fetch(currentImageUrl);
-        blob = await res.blob();
+        blob = await (await fetch(currentImageUrl)).blob();
       } else {
         blob = await fetch(currentImageUrl).then((r) => r.blob());
       }
