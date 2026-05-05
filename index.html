@@ -388,6 +388,57 @@
   }
   .download-btn:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 
+  /* Tweak bar */
+  .tweak-bar {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .tweak-bar.hidden { display: none; }
+  .tweak-bar input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .tweak-bar input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+  .tweak-bar button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .tweak-bar button:hover:not(:disabled) { background: var(--primary-hover); }
+  .tweak-bar button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .tweak-hint {
+    font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.04em;
+    padding-left: 4px;
+  }
+  .tweak-hint.hidden { display: none; }
+
   /* Password modal */
   .pw-overlay {
     position: fixed; inset: 0;
@@ -513,6 +564,11 @@
           </div>
           <button class="download-btn" id="downloadBtn">↓ Download</button>
         </div>
+        <div class="tweak-hint hidden" id="tweakHint">▸ tweak this image · only describe what to change (uses flux-2-klein, ~$0.015/edit if free tier exhausted)</div>
+        <div class="tweak-bar hidden" id="tweakBar">
+          <input type="text" id="tweakInput" placeholder="Describe just the change — e.g. 'make ribbon blue, keep rest same'" autocomplete="off" />
+          <button type="button" id="tweakBtn">Apply tweak</button>
+        </div>
       </section>
     </main>
   </div>
@@ -545,6 +601,10 @@
   const chips = document.getElementById('chips');
   const refreshChips = document.getElementById('refreshChips');
   const switcher = document.querySelector('.switcher');
+  const tweakBar = document.getElementById('tweakBar');
+  const tweakHint = document.getElementById('tweakHint');
+  const tweakInput = document.getElementById('tweakInput');
+  const tweakBtn = document.getElementById('tweakBtn');
   const pwOverlay = document.getElementById('pwOverlay');
   const pwForm = document.getElementById('pwForm');
   const pwInput = document.getElementById('pwInput');
@@ -758,6 +818,7 @@
       : 'Pollinations FLUX · 5-15s';
     result.innerHTML = `<div class="loading"><div class="spinner"></div><div class="loading-text">${renderText}</div></div>`;
     meta.classList.add('hidden');
+    hideTweakBar();
 
     try {
       const { url } = model === 'cloudflare-flux' ? await genCloudflareFlux(prompt) : await genPollinations(prompt);
@@ -769,6 +830,7 @@
         lastPromptEl.textContent = prompt;
         metaTag.textContent = currentLabel;
         meta.classList.remove('hidden');
+        showTweakBar();
       };
       img.onerror = () => {
         result.innerHTML = '<div class="error">Image load nahi hui. Try again.</div>';
@@ -780,6 +842,112 @@
       genBtn.disabled = false;
       promptInput.disabled = false;
       genBtn.textContent = 'Generate';
+    }
+  });
+
+  // ============ TWEAK / IMAGE EDIT ============
+  function showTweakBar() {
+    tweakBar.classList.remove('hidden');
+    tweakHint.classList.remove('hidden');
+  }
+  function hideTweakBar() {
+    tweakBar.classList.add('hidden');
+    tweakHint.classList.add('hidden');
+    tweakInput.value = '';
+  }
+
+  async function urlToBase64(url) {
+    if (url.startsWith('data:')) return url; // already a data URL
+    const blob = await (await fetch(url)).blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function callTweakBackend(prompt, sourceImage, token) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    return fetch('/.netlify/functions/cloudflare-flux-edit', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ prompt, sourceImage }),
+    });
+  }
+
+  async function tweakImage(editPrompt) {
+    if (!currentImageUrl) throw new Error('No image to tweak yet.');
+    const sourceImage = await urlToBase64(currentImageUrl);
+
+    let token = getPassword();
+    let r = await callTweakBackend(editPrompt, sourceImage, token);
+    if (r.status === 401) {
+      localStorage.removeItem('nimbus_token');
+      token = await askPassword();
+      if (!token) throw new Error('Password chahiye is mode ke liye.');
+      r = await callTweakBackend(editPrompt, sourceImage, token);
+      if (r.status === 401) throw new Error('Wrong password.');
+      localStorage.setItem('nimbus_token', token);
+    }
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((data.error || 'Request failed') + (data.detail ? ' — ' + data.detail : ''));
+    if (!data.image) throw new Error('No image returned.');
+    return {
+      url: `data:${data.mimeType || 'image/jpeg'};base64,${data.image}`,
+      mimeType: data.mimeType || 'image/jpeg',
+    };
+  }
+
+  async function runTweak() {
+    const editPrompt = tweakInput.value.trim();
+    if (!editPrompt || !currentImageUrl) return;
+
+    tweakBtn.disabled = true;
+    tweakInput.disabled = true;
+    const originalLabel = tweakBtn.textContent;
+    tweakBtn.innerHTML = '<span class="spinner" style="width:13px;height:13px;border-width:2px;border-color:rgba(255,255,255,0.3);border-top-color:#fff;"></span>Editing';
+
+    // Show loading on result while preserving previous image faintly
+    const previousHTML = result.innerHTML;
+    result.classList.remove('empty');
+    result.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">FLUX.2 klein editing · 6-12s</div></div>';
+
+    try {
+      const { url } = await tweakImage(editPrompt);
+      currentImageUrl = url;
+      // Append the tweak to the recorded prompt for clarity
+      currentPrompt = currentPrompt + '  ↳  ' + editPrompt;
+      currentLabel = 'TWEAK';
+
+      const img = new Image();
+      img.onload = () => {
+        result.innerHTML = '';
+        result.appendChild(img);
+        lastPromptEl.textContent = currentPrompt;
+        metaTag.textContent = currentLabel;
+        meta.classList.remove('hidden');
+        tweakInput.value = '';
+      };
+      img.onerror = () => {
+        result.innerHTML = '<div class="error">Image load nahi hui.</div>';
+      };
+      img.src = url;
+    } catch (err) {
+      result.innerHTML = '<div class="error">' + (err.message || 'Tweak fail.') + '</div>';
+    } finally {
+      tweakBtn.disabled = false;
+      tweakInput.disabled = false;
+      tweakBtn.textContent = originalLabel || 'Apply tweak';
+    }
+  }
+
+  tweakBtn.addEventListener('click', runTweak);
+  tweakInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      runTweak();
     }
   });
 
