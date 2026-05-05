@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pukit · image gen</title>
+<title>Nimbus marketing · image gen</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -16,33 +16,86 @@
   }
   .stack {
     width: 100%;
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
+    gap: 24px;
   }
-  h1 {
-    font-size: clamp(48px, 9vw, 88px);
+  .brand {
+    text-align: center;
+    margin-top: 6vh;
+    line-height: 0.9;
+  }
+  .brand-1 {
+    font-size: clamp(48px, 9vw, 84px);
     font-weight: 800;
     letter-spacing: -0.04em;
-    line-height: 1;
-    margin-top: 8vh;
+    color: #f4ede0;
+  }
+  .brand-2 {
+    font-size: clamp(20px, 3.2vw, 30px);
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    color: #b3ab9b;
+    margin-top: 4px;
   }
   .sub {
     font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
-    font-size: 12px;
-    letter-spacing: 0.08em;
+    font-size: 11px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #6b6558;
   }
   .sub b { color: #ff5e1f; font-weight: 600; }
+
+  /* Prompt chips */
+  .suggestions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .suggestions-label {
+    font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b6558;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    background: #1c1b18;
+    color: #b3ab9b;
+    border: 1px solid #2e2d2a;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .chip:hover {
+    background: #232220;
+    border-color: #ff5e1f;
+    color: #f4ede0;
+  }
+  .chip:active { transform: translateY(1px); }
+
+  /* Form */
   form {
     width: 100%;
     display: flex;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 4px;
   }
   input[type="text"] {
     flex: 1;
@@ -61,7 +114,7 @@
     box-shadow: 0 0 0 4px rgba(255,94,31,0.15);
   }
   input[type="text"]:disabled { opacity: 0.5; }
-  button {
+  button.gen {
     background: #ff5e1f;
     color: #1a0a00;
     border: none;
@@ -77,13 +130,15 @@
     align-items: center;
     gap: 8px;
   }
-  button:hover:not(:disabled) { transform: translateY(-2px); }
-  button:active:not(:disabled) { transform: translateY(0); }
-  button:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+  button.gen:hover:not(:disabled) { transform: translateY(-2px); }
+  button.gen:active:not(:disabled) { transform: translateY(0); }
+  button.gen:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
+  /* Result */
   .result {
     width: 100%;
     min-height: 200px;
-    margin-top: 8px;
+    margin-top: 4px;
     border-radius: 18px;
     background: #161513;
     border: 1px solid #2e2d2a;
@@ -157,18 +212,38 @@
     cursor: pointer;
     text-decoration: none;
     transition: all 0.15s;
+    white-space: nowrap;
   }
   .download-btn:hover { background: #2e2d2a; border-color: #3d3b37; }
 </style>
 </head>
 <body>
   <div class="stack">
-    <h1>Pukit</h1>
-    <div class="sub">free image gen · powered by <b>pollinations</b></div>
+    <div class="brand">
+      <div class="brand-1">Nimbus</div>
+      <div class="brand-2">marketing</div>
+    </div>
+    <div class="sub">image gen · powered by <b>pollinations</b></div>
+
+    <div class="suggestions">
+      <div class="suggestions-label">▸ try a logistics prompt</div>
+      <div class="chips" id="chips">
+        <button class="chip" data-prompt="delivery rider on motorcycle in Indian street at golden hour, branded helmet, motion blur, cinematic photography, ultra detailed">delivery rider · golden hour</button>
+        <button class="chip" data-prompt="festive Diwali sale banner for ecommerce shipping brand, gift boxes with diyas, vibrant colors, modern Indian aesthetic, hero composition">diwali sale banner</button>
+        <button class="chip" data-prompt="premium cardboard shipping package with branded label and twine, soft studio lighting, minimalist product photography, clean white backdrop">premium packaging shot</button>
+        <button class="chip" data-prompt="modern automated warehouse interior with conveyor belts and stacked packages, cool blue ambient lighting, wide angle, photorealistic">automated warehouse</button>
+        <button class="chip" data-prompt="courier rider zooming through monsoon rain in Mumbai street, water splashes, dramatic atmosphere, cinematic photography, motion">monsoon courier</button>
+        <button class="chip" data-prompt="freight truck on highway at sunset, golden hour, motion blur, India national highway, wide cinematic shot, atmospheric">freight truck · highway</button>
+        <button class="chip" data-prompt="eco-friendly kraft paper shipping box with green ribbon and leaves, sustainability concept, soft natural light, editorial product photography">eco-friendly packaging</button>
+        <button class="chip" data-prompt="same-day delivery hero banner, fast motion blur, package being handed over, energetic, bold typography space, modern ecommerce">same-day delivery hero</button>
+      </div>
+    </div>
+
     <form id="form">
-      <input type="text" id="prompt" placeholder="Describe the image — e.g. sunset over Goa beach, cinematic" autocomplete="off" />
-      <button type="submit" id="genBtn">Generate</button>
+      <input type="text" id="prompt" placeholder="Describe the image — or pick a chip above" autocomplete="off" />
+      <button type="submit" class="gen" id="genBtn">Generate</button>
     </form>
+
     <div class="result empty" id="result"></div>
     <div class="meta" id="meta" style="display:none;">
       <div class="meta-prompt"><span>prompt:</span><span id="lastPrompt"></span></div>
@@ -183,9 +258,19 @@
   const meta = document.getElementById('meta');
   const lastPromptEl = document.getElementById('lastPrompt');
   const downloadBtn = document.getElementById('downloadBtn');
+  const chips = document.getElementById('chips');
 
   let currentImageUrl = null;
   let currentPrompt = '';
+
+  // Chip click -> fill input
+  chips.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    promptInput.value = chip.dataset.prompt;
+    promptInput.focus();
+    promptInput.setSelectionRange(promptInput.value.length, promptInput.value.length);
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -197,7 +282,6 @@
     const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${seed}&nologo=true&model=flux`;
     currentImageUrl = url;
 
-    // Loading state
     genBtn.disabled = true;
     promptInput.disabled = true;
     genBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span>Generating';
@@ -205,7 +289,6 @@
     result.innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">FLUX rendering · usually 5-15s</div></div>';
     meta.style.display = 'none';
 
-    // Load image
     const img = new Image();
     img.onload = () => {
       result.innerHTML = '';
@@ -233,7 +316,7 @@
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       const safeName = currentPrompt.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50);
-      a.download = `pukit-${safeName}-${Date.now()}.jpg`;
+      a.download = `nimbus-${safeName}-${Date.now()}.jpg`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -246,7 +329,6 @@
     }
   });
 
-  // Pre-focus input
   promptInput.focus();
 </script>
 </body>
