@@ -860,7 +860,7 @@
   }
 
   async function genCloudflareFlux(prompt) {
-    return genFromFunction('/.netlify/functions/cloudflare-flux', prompt);
+    return genFromFunction('/api/cloudflare-flux', prompt);
   }
 
   // Kling is async — submit task, poll for result
@@ -870,7 +870,7 @@
     async function attemptCreate(authToken) {
       const headers = { 'Content-Type': 'application/json' };
       if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
-      return fetch('/.netlify/functions/kling-image-create', {
+      return fetch('/api/kling-image-create', {
         method: 'POST',
         headers,
         body: JSON.stringify({ prompt }),
@@ -904,7 +904,7 @@
 
     while (Date.now() - start < TIMEOUT) {
       await new Promise((res) => setTimeout(res, 3500));
-      const sr = await fetch('/.netlify/functions/kling-image-status?task_id=' + encodeURIComponent(taskId), {
+      const sr = await fetch('/api/kling-image-status?task_id=' + encodeURIComponent(taskId), {
         headers: pollHeaders,
       });
       const status = await sr.json().catch(() => ({}));
@@ -1002,7 +1002,7 @@
   async function callTweakBackend(prompt, sourceImage, token) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    return fetch('/.netlify/functions/cloudflare-flux-edit', {
+    return fetch('/api/cloudflare-flux-edit', {
       method: 'POST',
       headers,
       body: JSON.stringify({ prompt, sourceImage }),
