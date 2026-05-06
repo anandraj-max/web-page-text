@@ -641,54 +641,113 @@
   });
 
   // ============ PROMPT POOL ============
-  // Pool of logistics / shipping / ecommerce creative prompts.
-  // Refresh button picks 8 at random.
+  // Brand-aligned for NimbusPost (eCommerce shipping aggregator).
+  // Categories: NDR resolution, RTO reduction, COD safety, multi-courier USP,
+  // address verification, dashboard/ops, reverse pickup, India coverage,
+  // festive scale-up, brand/founder narratives, speed/SLA, trust/safety.
   const PROMPT_POOL = [
-    { label: 'delivery rider', prompt: 'delivery rider on motorcycle in Indian street at golden hour, branded helmet, motion blur, cinematic photography, ultra detailed' },
-    { label: 'diwali sale', prompt: 'festive Diwali sale banner for ecommerce shipping brand, gift boxes with diyas, vibrant colors, modern Indian aesthetic, hero composition' },
-    { label: 'premium packaging', prompt: 'premium cardboard shipping package with branded label and twine, soft studio lighting, minimalist product photography, clean white backdrop' },
-    { label: 'automated warehouse', prompt: 'modern automated warehouse interior with conveyor belts and stacked packages, cool blue ambient lighting, wide angle, photorealistic' },
-    { label: 'monsoon courier', prompt: 'courier rider zooming through monsoon rain in Mumbai street, water splashes, dramatic atmosphere, cinematic photography, motion' },
-    { label: 'freight truck', prompt: 'freight truck on highway at sunset, golden hour, motion blur, India national highway, wide cinematic shot, atmospheric' },
-    { label: 'eco packaging', prompt: 'eco-friendly kraft paper shipping box with green ribbon and leaves, sustainability concept, soft natural light, editorial product photography' },
-    { label: 'same-day hero', prompt: 'same-day delivery hero banner, fast motion blur, package being handed over, energetic, bold typography space, modern ecommerce' },
-    { label: 'doorstep parcels', prompt: 'stack of cardboard parcels on a sunny doorstep, indian residential, warm light, cinematic still life photography' },
-    { label: 'unboxing moment', prompt: 'customer happily unboxing a package at home, cozy living room, natural light, candid lifestyle photography, indian family vibe' },
-    { label: 'kirana delivery', prompt: 'delivery van parked outside a bustling kirana store, indian neighborhood, documentary style, late afternoon light' },
-    { label: 'drone delivery', prompt: 'drone delivery package landing on rooftop, modern indian apartment, blue sky, futuristic ecommerce concept, clean photography' },
-    { label: 'holi sale', prompt: 'holi festive sale banner, vibrant color powder splashes, packages with rainbow ribbons, energetic composition, marketing hero' },
-    { label: 'last-mile scooter', prompt: 'last mile delivery scooter weaving through traffic, top-down angle, urban india, motion-blurred cars, cinematic' },
-    { label: 'barcode scan', prompt: 'warehouse worker scanning barcode on package, focused expression, industrial lighting, documentary photography, ultra sharp' },
-    { label: 'cargo plane', prompt: 'cargo plane being loaded with shipping containers at airport, dawn, dramatic lighting, wide cinematic shot, photorealistic' },
-    { label: 'truck hub at night', prompt: 'row of trucks at logistics hub at night, neon lights, drizzle, cyberpunk industrial mood, cinematic photography' },
-    { label: 'fragile package', prompt: 'bubble-wrapped fragile package with handle-with-care label, soft studio lighting, minimal product photography, clean backdrop' },
-    { label: 'christmas gifts', prompt: 'holiday season delivery rider with wrapped gift boxes, cozy festive mood, warm tones, marketing banner composition' },
-    { label: 'tricolor banner', prompt: 'independence day patriotic delivery banner, tricolor packages, indian flag motifs, hero composition, vibrant photography' },
-    { label: 'small biz packing', prompt: 'small business owner carefully packing handmade products, cozy workshop, warm lighting, candid lifestyle photography' },
-    { label: 'EV fleet', prompt: 'fleet of electric delivery vehicles parked in row, sustainable logistics, clean modern photography, blue sky, hero shot' },
-    { label: 'cold chain truck', prompt: 'cold chain refrigerated truck on highway, frost details on the body, professional logistics photography, cinematic' },
-    { label: 'tape seal macro', prompt: 'close-up of hands sealing a cardboard box with branded packing tape, macro photography, soft studio light, ultra detailed' },
-    { label: 'rakhi sale', prompt: 'festive raksha bandhan delivery banner, rakhi gift boxes with traditional motifs, warm tones, sibling theme, ecommerce hero' },
-    { label: 'rural delivery', prompt: 'rural delivery rider on dusty village road, traditional indian setting, golden hour, documentary photography, atmospheric' },
-    { label: 'tier-2 market', prompt: 'tier-2 city marketplace with delivery boys outside small shops, indian streetscape, candid documentary, bustling daylight' },
-    { label: 'luxury unbox', prompt: 'luxury subscription box reveal moment, premium ecommerce styling, dark moody lighting, editorial photography, ultra detailed' },
-    { label: 'control room', prompt: 'busy logistics control room with screens showing delivery routes, modern data dashboards, blue ambient lighting, technology feel' },
-    { label: 'holi splash', prompt: 'package bursting with colorful holi powder splashes, dynamic motion freeze, festive marketing hero, vibrant photography' },
-    { label: 'monsoon raincoat', prompt: 'raincoat-wearing delivery boy with waterproof package in heavy rain, cinematic motion, dramatic lighting, indian street' },
-    { label: 'valentine gift', prompt: 'valentine’s day gift box with red ribbon and rose petals, romantic ecommerce hero, soft warm lighting, editorial' },
-    { label: 'dawn dock', prompt: 'dawn warehouse loading dock, trucks lined up, golden light streaming through doors, atmospheric documentary photography' },
-    { label: 'onam package', prompt: 'festive Onam sale package with banana leaves and traditional pookalam pattern, vibrant Kerala aesthetic, marketing hero' },
-    { label: 'winter delivery', prompt: 'winter morning package delivery on a cozy doorstep with steam from chai, warm lighting, indian residential, lifestyle' },
-    { label: 'subscription box flatlay', prompt: 'flatlay of curated subscription box contents, neat arrangement, brand styling, soft top-down studio light, premium ecommerce' },
-    { label: 'rickshaw delivery', prompt: 'auto rickshaw stacked with parcels in indian street, tier-2 city aesthetic, candid documentary, golden afternoon' },
-    { label: 'cycle courier', prompt: 'bicycle courier with insulated delivery bag in heritage indian street, soft golden light, candid lifestyle photography' },
-    { label: 'package x-ray', prompt: 'concept image of package being scanned through x-ray, minimal techy aesthetic, blue and white palette, marketing visual' },
-    { label: 'chai stop break', prompt: 'delivery rider taking chai break at roadside tapri, candid documentary moment, warm tones, indian street culture' },
+    // NDR (Non-Delivery Report) resolution
+    { label: 'NDR resolved', prompt: 'delivery rider successfully handing over package on a second attempt to a smiling Indian customer at apartment door, smartphone overlay showing NDR-resolved status with brand-blue UI, golden hour, marketing hero photography' },
+    { label: '2nd attempt success', prompt: 'delivery boy with package returning for second attempt at Indian residential building, customer at door this time, candid documentary photography, warm afternoon light' },
+    { label: 'WhatsApp reschedule', prompt: 'close-up of Indian customer reading a WhatsApp business message rescheduling their delivery slot, hand holding phone, brand-blue chat bubbles UI mockup, lifestyle marketing visual' },
+    { label: 'NDR dashboard', prompt: 'Indian SMB seller looking at a clean modern shipping dashboard on laptop showing climbing NDR-resolved rate metric, blue-and-white interface, cozy office, photorealistic over-shoulder shot' },
+    { label: 'failed→success split', prompt: 'split-frame marketing visual: left half shows missed delivery and disappointed customer, right half shows successful re-delivery with happy customer, both in Indian residential context, cinematic before-after' },
+
+    // Address / pin code verification
+    { label: 'address OTP verify', prompt: 'delivery rider standing at customer door with smartphone showing OTP verification screen for safe handover, Indian residential corridor, blue brand UI overlay, marketing hero' },
+    { label: 'address auto-fix', prompt: 'phone screen close-up showing typo customer address being auto-corrected to verified address by AI, before-after UX mockup, brand-blue accent, clean product photography' },
+    { label: 'pin-code map', prompt: 'India map infographic with pin-code dots glowing across all states, satellite-style view, blue-and-white brand overlay showing precision delivery coverage, premium marketing visual' },
+    { label: 'wrong order caught', prompt: 'warehouse worker spotting and stopping a wrongly-labelled package before dispatch, focused moment, modern ops floor, blue ambient light, documentary photography' },
+
+    // RTO reduction
+    { label: 'RTO chart down', prompt: 'modern dashboard graphic showing return-to-origin rate dropping month-over-month, green metric tiles, blue brand UI, ecommerce growth marketing visual, photorealistic screen' },
+    { label: 'RTO heatmap', prompt: 'India map with RTO heatmap overlay, hot red zones cooling to green over time, infographic style with brand-blue palette, marketing hero for shipping aggregator' },
+    { label: 'RTO saved at door', prompt: 'delivery boy on phone confirming COD with customer just before final attempt, package about to be saved from RTO, Indian street, cinematic motion' },
+    { label: 'returns avoided', prompt: 'celebratory shot of warehouse staff with stack of packages labelled "RTO avoided this month", motivational ops culture, candid documentary, warm lighting' },
+
+    // COD (Cash on Delivery) safety
+    { label: 'COD doorstep', prompt: 'Indian customer paying cash at doorstep to delivery boy, secure transaction moment with branded package, warm afternoon light, candid lifestyle marketing photography' },
+    { label: 'WhatsApp COD confirm', prompt: 'phone screen showing WhatsApp business message confirming a Cash-on-Delivery order before dispatch, brand-blue chat UI, hand holding device, marketing hero' },
+    { label: 'UPI at door', prompt: 'customer paying via UPI QR code on phone instead of cash to delivery boy, modern Indian payment moment, daylight residential, candid', },
+    { label: 'COD secure tag', prompt: 'sealed COD package with prominent security tag and tamper-evident seal, studio product photography, soft lighting, brand-aligned' },
+
+    // Multi-courier / aggregator USP
+    { label: 'courier rate compare', prompt: 'laptop screen close-up showing a rate-comparison dashboard between multiple Indian courier partners, clean modern UI in brand-blue palette, marketing screenshot composition' },
+    { label: 'all couriers one panel', prompt: 'over-shoulder shot of SMB owner viewing unified shipments dashboard showing different couriers tagged on each order, brand-blue UI, cozy office' },
+    { label: 'best rate auto-pick', prompt: 'animated UI mockup of system auto-selecting cheapest courier from a list of options for a single order, modern dashboard close-up, brand-blue highlights' },
+    { label: 'partners constellation', prompt: 'marketing hero of major Indian courier partner logos arranged as a constellation around brand center, clean blue gradient background, premium B2B aesthetic' },
+
+    // Dashboard / Ops
+    { label: 'bulk import orders', prompt: 'animation-style still of CSV file of orders being imported into a shipping dashboard, progress bar filling, modern brand-blue UI, ecommerce ops visual' },
+    { label: 'live tracking phone', prompt: 'phone screen showing live delivery map with package icon moving along Indian city route in real time, brand-blue UI, hand holding phone, lifestyle marketing' },
+    { label: 'SMB founder ops', prompt: 'Indian SMB founder reviewing shipping metrics on laptop in cozy home-office, focused expression, soft window light, candid hero shot for entrepreneurship marketing' },
+    { label: 'thermal label print', prompt: 'hands printing shipping label on thermal printer in small warehouse, sharp focus on label coming out, candid documentary photography, warm light' },
+    { label: 'order in 5 sec', prompt: 'dynamic visual of an order moving from cart to ready-to-ship in seconds, motion-blur sequence collage, brand-aligned dashboard UI elements, marketing hero' },
+    { label: 'catalog import', prompt: 'product photos being imported into a shipping dashboard, drag-and-drop UI mockup, brand-blue palette, ecommerce setup marketing visual' },
+
+    // Coverage / India-wide
+    { label: 'India routes glow', prompt: 'India map at night with delivery routes glowing as pulsing blue lines connecting cities, cinematic infographic, brand-aligned, marketing hero' },
+    { label: 'tier-2 reach', prompt: 'tier-2 Indian city marketplace bustling with delivery vehicles from the brand, candid documentary photography, late afternoon light' },
+    { label: 'pan-india promise', prompt: 'wide cinematic landscape shot showing delivery vehicles dotting Indian roads from Himalayas to Kerala backwaters, atmospheric, marketing hero' },
+    { label: 'last-mile village', prompt: 'rural village last-mile delivery moment, brand-uniform rider on dusty road handing package to elderly customer, golden hour, documentary photography' },
+    { label: 'hyperlocal vs interstate', prompt: 'split badge-card visual: 30-minute hyperlocal delivery vs 2-day interstate shipping, modern infographic, brand-blue palette, marketing comparison' },
+
+    // Festive scaling
+    { label: 'BBD ops floor', prompt: 'massive sortation hub during Big Billion Days sale season, packages flowing through conveyors, organized rush, wide cinematic shot, dramatic lighting' },
+    { label: 'diwali ready warehouse', prompt: 'warehouse stacked with festive Diwali packages, gold-and-blue decorations, celebratory pre-rush atmosphere, photorealistic marketing hero' },
+    { label: 'holi shipping rush', prompt: 'colorful Holi-themed packages on conveyor belt in warehouse, vibrant powder hints, festive scaling marketing visual, energetic composition' },
+    { label: 'festive growth chart', prompt: 'dashboard showing seller order volume growing 10x during festive sale, dynamic chart, brand-blue UI, marketing screenshot' },
+    { label: 'rakhi peak orders', prompt: 'Raksha Bandhan themed packages being prepped in warehouse with rakhi motifs, sibling-gift festive marketing visual, warm tones' },
+
+    // Brand / Founder narrative
+    { label: 'first to 1000 orders', prompt: 'Indian SMB owner celebrating shipping their 1000th order, balloons or simple celebration in cozy workspace, warm light, brand-aligned candid hero' },
+    { label: 'garage to scale', prompt: 'time-lapse style composition: small home garage packing setup on left, full warehouse operation on right, growth narrative marketing visual' },
+    { label: 'founder packs first', prompt: 'small-business founder personally taping first order at home dining table, intimate origin moment, warm window light, lifestyle photography' },
+    { label: 'customer thanks', prompt: 'happy Indian customer holding branded package at doorstep, smiling at camera, warm residential interior visible, marketing lifestyle hero' },
+
+    // Reverse logistics
+    { label: 'reverse pickup easy', prompt: 'delivery boy collecting a return package from customer at Indian apartment door, smiling exchange, brand-blue uniform, candid marketing visual' },
+    { label: 'one-tap return', prompt: 'phone screen close-up showing "return scheduled" confirmation with single tap, brand-blue UI mockup, hand holding device, lifestyle photography' },
+
+    // Speed / SLA
+    { label: 'same-day promise', prompt: 'visual of stopwatch overlaying a package being handed off, fast motion blur background, marketing hero for same-day delivery promise, brand-blue accents' },
+    { label: '24h delivery hero', prompt: 'calendar / timeline graphic showing 24-hour delivery promise with package icon traveling, modern brand-blue infographic style' },
+    { label: 'express bike rider', prompt: 'brand-wrapped delivery bike with rider zooming through Indian traffic at sunset, motion blur, marketing hero photography' },
+    { label: 'on-time SLA chart', prompt: 'modern dashboard showing 98% on-time delivery SLA metric, big bold numbers, brand-blue UI, ecommerce ops marketing screenshot' },
+
+    // Trust / Safety
+    { label: 'tamper-proof macro', prompt: 'macro close-up of sealed shipping package with security tag and brand-aligned tamper-evident seal, studio product photography, sharp focus' },
+    { label: 'insurance shield', prompt: 'conceptual marketing visual: package wrapped in soft glowing shield indicating shipment insurance, brand-blue palette, premium clean composition' },
+    { label: 'OTP secured handoff', prompt: 'customer entering OTP on phone at doorstep for secure package handoff to delivery boy, hand close-up, brand-blue UI overlay, lifestyle hero' },
+
+    // Sustainability
+    { label: 'EV fleet lined up', prompt: 'fleet of brand-wrapped electric delivery vehicles parked in row at depot, clean morning light, sustainability narrative, marketing hero photography' },
+    { label: 'eco kraft packaging', prompt: 'eco-friendly kraft paper shipping box with green twine and leaves, sustainability concept, soft natural light, editorial product photography' },
+
+    // International
+    { label: 'cross-border crate', prompt: 'international shipping crate with multiple country flag tags at port, dramatic dock lighting, marketing hero for cross-border shipping' },
+    { label: 'world wide ship', prompt: 'globe concept visual with packages floating across oceans connecting India to global destinations, brand-blue palette, marketing hero' },
   ];
 
+  // Track recent indexes so consecutive shuffles avoid repeats.
+  const RECENT_LIMIT = 16;
+  let recentIndexes = [];
+
   function pickRandomPrompts(n) {
-    const shuffled = [...PROMPT_POOL].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, n);
+    const allIdx = PROMPT_POOL.map((_, i) => i);
+    const recentSet = new Set(recentIndexes);
+    let available = allIdx.filter((i) => !recentSet.has(i));
+    // If pool too small after filtering, fall back to full list
+    if (available.length < n) available = allIdx;
+    // Fisher-Yates partial shuffle for n picks
+    for (let i = available.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [available[i], available[j]] = [available[j], available[i]];
+    }
+    const pickedIdx = available.slice(0, n);
+    // Update recent buffer (queue trim to RECENT_LIMIT)
+    recentIndexes = [...pickedIdx, ...recentIndexes].slice(0, RECENT_LIMIT);
+    return pickedIdx.map((i) => PROMPT_POOL[i]);
   }
 
   function escapeAttr(s) {
