@@ -107,8 +107,8 @@
     <div class="layer s2-layer" id="s2Layer">
       <div class="glass">
         <div class="kicker">One intelligent network</div>
-        <h2 class="serif">Every order, every courier —<br><em>organised in one place.</em></h2>
-        <p>Chaos becomes clarity. NimbusPost routes each shipment to the best carrier automatically, so your operations move as one.</p>
+        <h2 class="serif">Every courier,<br><em>one network.</em></h2>
+        <p>We auto-route every shipment to the best carrier.</p>
         <div class="row">
           <div><div class="n">25+</div><div class="l">Courier partners</div></div>
           <div><div class="n">99.3%</div><div class="l">Delivery success</div></div>
@@ -280,10 +280,11 @@
       gpos.copy(u.grid);hpos.copy(u.home);hpos.y+=Math.sin(t*u.bob+u.offset)*0.5;
       const bx=lerp(hpos.x,gpos.x,e),by=lerp(hpos.y,gpos.y,e),bz=lerp(hpos.z,gpos.z,e);
       if(hasMouse&&cursorInfl>0.05){
-        b.getWorldPosition(tmp);const dx=tmp.x-cursorWorld.x,dy=tmp.y-cursorWorld.y;const d2=dx*dx+dy*dy;const R=5;
-        if(d2<R*R){const d=Math.sqrt(d2)||1e-3;const f=(1-d/R)*cursorInfl;u.disp.x+=(dx/d)*f*0.6;u.disp.y+=(dy/d)*f*0.6;}
+        b.getWorldPosition(tmp);const dx=tmp.x-cursorWorld.x,dy=tmp.y-cursorWorld.y;const d2=dx*dx+dy*dy;const R=7.5;
+        if(d2<R*R){const d=Math.sqrt(d2)||1e-3;const f=(1-d/R)*cursorInfl;u.disp.x+=(dx/d)*f*1.25;u.disp.y+=(dy/d)*f*1.25;
+          b.rotation.x+=f*0.05; b.rotation.y+=(dx/d)*f*0.05;}
       }
-      u.disp.multiplyScalar(0.88);
+      u.disp.multiplyScalar(0.9);
       b.position.x+=((bx+u.disp.x)-b.position.x)*0.12;
       b.position.y+=((by+u.disp.y)-b.position.y)*0.12;
       b.position.z+=(bz-b.position.z)*0.12;
