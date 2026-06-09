@@ -615,7 +615,7 @@ window.loadNimbusLaptop=function(cb){
 
   // ---- laptop ----
   const lap=new THREE.Group();
-  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(2.9); m.rotation.y=-0.1; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
+  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(2.6); m.rotation.y=Math.PI/2; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
   lap.position.set(1.55,0.16,0.0);lap.rotation.y=-0.34;grp.add(lap);
 
   // ---- monitor (left-back) ----
@@ -749,7 +749,7 @@ window.loadNimbusLaptop=function(cb){
 
   // ---- floating laptop (not physics) ----
   const lap=new THREE.Group();
-  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(3.4); m.rotation.y=0; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
+  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(3.0); m.rotation.y=Math.PI/2; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
   const lapBaseY=2.0+2*HH+0.4; lap.position.set(0,lapBaseY,0.1); scene.add(lap);
 
   // ---- pointer -> world plane ----
