@@ -616,6 +616,7 @@ window.loadNimbusLaptop=function(cb){
   // ---- laptop ----
   const lap=new THREE.Group();
   if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(2.6); m.rotation.y=Math.PI/2; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
+  function rr(c,a,b,w,h,r){c.beginPath();c.moveTo(a+r,b);c.arcTo(a+w,b,a+w,b+h,r);c.arcTo(a+w,b+h,a,b+h,r);c.arcTo(a,b+h,a,b,r);c.arcTo(a,b,a+w,b,r);c.closePath();}
   lap.position.set(1.55,0.16,0.0);lap.rotation.y=-0.34;grp.add(lap);
 
   // ---- monitor (left-back) ----
