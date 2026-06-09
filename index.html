@@ -681,7 +681,7 @@
   renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=0.92;
   const scene=new THREE.Scene();
   let W=host.clientWidth,H=560;
-  const cam=new THREE.PerspectiveCamera(32,W/H,0.1,120); cam.position.set(0.6,4.6,15.5); cam.lookAt(0,1.5,0);
+  const cam=new THREE.PerspectiveCamera(32,W/H,0.1,120); cam.position.set(0.4,4.0,14); cam.lookAt(0,1.3,0);
 
   // ---- studio lighting ----
   scene.add(new THREE.HemisphereLight(0xffffff,0xdce5fb,0.5));
@@ -708,8 +708,8 @@
   const tapeMat=new THREE.MeshStandardMaterial({color:0xe9dab4,roughness:0.5});
 
   // ---- physics world ----
-  const world=new CANNON.World(); world.gravity.set(0,-24,0); world.broadphase=new CANNON.NaiveBroadphase(); world.solver.iterations=14; world.allowSleep=true;
-  const pmat=new CANNON.Material('p'); world.addContactMaterial(new CANNON.ContactMaterial(pmat,pmat,{friction:0.6,restitution:0.03}));
+  const world=new CANNON.World(); world.gravity.set(0,-18,0); world.broadphase=new CANNON.SAPBroadphase(world); world.solver.iterations=22; world.solver.tolerance=0.001; world.allowSleep=true; world.defaultContactMaterial.friction=0.8;
+  const pmat=new CANNON.Material('p'); world.addContactMaterial(new CANNON.ContactMaterial(pmat,pmat,{friction:0.85,restitution:0.0}));
   const ground=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:pmat}); ground.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2); world.addBody(ground);
   function pl(axis,angle,px,pz){const b=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:pmat});b.quaternion.setFromAxisAngle(new CANNON.Vec3(axis[0],axis[1],axis[2]),angle);b.position.set(px,0,pz);world.addBody(b);}
   pl([1,0,0],0,0,-5.5);            // back wall
@@ -720,8 +720,8 @@
   // ---- box stack (pyramid: 4 bottom, 3 top) ----
   const HW=1.0,HH=0.72,HD=0.82;
   const layout=[
-    [-3.3,HH,0],[-1.1,HH,0],[1.1,HH,0],[3.3,HH,0],
-    [-2.2,HH+2*HH,0],[0,HH+2*HH,0],[2.2,HH+2*HH,0]
+    [-3.35,HH+0.02,0],[-1.12,HH+0.02,0],[1.12,HH+0.02,0],[3.35,HH+0.02,0],
+    [-2.24,HH+2*HH+0.06,0],[0,HH+2*HH+0.06,0],[2.24,HH+2*HH+0.06,0]
   ];
   const items=[];
   layout.forEach(p=>{
@@ -729,7 +729,7 @@
     const tape=new THREE.Mesh(new THREE.BoxGeometry(2*HW*1.02,0.05,2*HD*0.26),tapeMat); tape.position.y=HH; mesh.add(tape);
     scene.add(mesh);
     const body=new CANNON.Body({mass:1.3,material:pmat}); body.addShape(new CANNON.Box(new CANNON.Vec3(HW,HH,HD)));
-    body.position.set(p[0],p[1],p[2]); body.linearDamping=0.22; body.angularDamping=0.4;
+    body.position.set(p[0],p[1],p[2]); body.linearDamping=0.3; body.angularDamping=0.55;
     body.allowSleep=true; body.sleepSpeedLimit=0.4; body.sleepTimeLimit=0.6;
     world.addBody(body);
     items.push({mesh,body,home:new CANNON.Vec3(p[0],p[1],p[2])});
@@ -766,10 +766,10 @@
     if(active){ if(hasLast){pmove.subVectors(cw,lastcw);} lastcw.copy(cw); hasLast=true; } else { pmove.set(0,0,0); }
     const speed=pmove.length();
     // push nearby boxes by pointer movement
-    if(active && speed>0.01){
+    if(active && speed>0.015){
       for(const it of items){
-        const b=it.body; const dx=b.position.x-cw.x, dy=b.position.y-cw.y; const d=Math.hypot(dx,dy); const R=3.2;
-        if(d<R){ b.wakeUp(); const f=(1-d/R); const k=22;
+        const b=it.body; const dx=b.position.x-cw.x, dy=b.position.y-cw.y; const d=Math.hypot(dx,dy); const R=2.9;
+        if(d<R){ b.wakeUp(); const f=(1-d/R); const k=17;
           b.velocity.x+=pmove.x*k*f; b.velocity.y+=Math.max(pmove.y,0)*k*f*0.6+f*0.6; b.velocity.z+=pmove.z*k*f;
           b.angularVelocity.x+=(Math.random()-0.5)*f*2; b.angularVelocity.z+=(Math.random()-0.5)*f*2;
         }
