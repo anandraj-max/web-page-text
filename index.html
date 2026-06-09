@@ -118,6 +118,24 @@
   .scalest{display:flex;gap:26px}
   .scalest .n{font-size:30px;font-weight:800;color:var(--accent);letter-spacing:-.02em}
   .scalest .l{font-size:12px;color:var(--ink-3);margin-top:2px}
+  /* ===== SECTION 4: AI-native (isometric 3D, Fynd-style) ===== */
+  .ai3d{background:linear-gradient(180deg,#ffffff,var(--cream));padding:100px 0 110px;position:relative;z-index:5;overflow:hidden}
+  .ai3d .wrap{display:grid;grid-template-columns:0.92fr 1.08fr;gap:36px;align-items:center}
+  @media(max-width:920px){.ai3d .wrap{grid-template-columns:1fr}}
+  .ai3d h2{font-size:clamp(40px,6vw,76px);font-weight:700;letter-spacing:-.04em;line-height:1.0;color:var(--ink)}
+  .ai3d .lead{color:var(--ink-2);font-size:18px;margin:24px 0 28px;max-width:34ch}
+  .ai3d .demo{display:inline-flex;align-items:center;gap:9px;background:var(--ink);color:#fff;font-weight:600;font-size:15px;padding:14px 26px;border-radius:999px;border:none;cursor:pointer;transition:.2s}
+  .ai3d .demo:hover{background:#000;transform:translateY(-1px)}
+  .ai3d .demo .ar{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.18)}
+  .ai3d .stats{display:flex;gap:30px;margin-top:42px;flex-wrap:wrap}
+  .ai3d .stats .n{font-size:clamp(24px,2.6vw,32px);font-weight:700;color:var(--ink);letter-spacing:-.02em}
+  .ai3d .stats .l{font-size:12.5px;color:var(--ink-3);margin-top:3px;max-width:13ch;line-height:1.3}
+  .stage3d{position:relative;min-height:520px}
+  #scene4{width:100%;height:540px;display:block}
+  .gencard{position:absolute;right:2%;top:14%;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 26px 60px rgba(23,24,43,.18);max-width:300px;z-index:3}
+  .gencard p{font-size:15px;color:var(--ink);line-height:1.45}
+  .gencard .gen{margin-top:16px;float:right;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3D6BFF,#003CF0);color:#fff;font-weight:600;font-size:14px;padding:10px 18px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(0,60,240,.3)}
+  .gencard::after{content:"";display:block;clear:both}
   .rail{position:fixed;left:0;top:0;height:3px;width:100%;z-index:70;background:transparent}
   .rail span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
 </style>
@@ -247,6 +265,30 @@
           <div><div class="n">150M+</div><div class="l">Shipments delivered</div></div>
           <div><div class="n">1,00,000+</div><div class="l">Businesses powered</div></div>
         </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: AI-native unified logistics (isometric 3D) -->
+<section class="ai3d">
+  <div class="wrap">
+    <div class="copy">
+      <h2>AI-native unified logistics</h2>
+      <p class="lead">Ship your orders, sell across marketplaces, and automate fulfilment using AI — on a platform built for speed, accuracy and scale.</p>
+      <button class="demo">Book a demo <span class="ar">›</span></button>
+      <div class="stats">
+        <div><div class="n">150M+</div><div class="l">shipments delivered</div></div>
+        <div><div class="n">1,00,000+</div><div class="l">businesses served</div></div>
+        <div><div class="n">25+</div><div class="l">courier partners</div></div>
+        <div><div class="n">29K+</div><div class="l">pincodes covered</div></div>
+      </div>
+    </div>
+    <div class="stage3d">
+      <canvas id="scene4"></canvas>
+      <div class="gencard">
+        <p>Generate the cheapest label for Almina’s order to Bengaluru</p>
+        <button class="gen">✦ Generate</button>
       </div>
     </div>
   </div>
@@ -475,6 +517,69 @@
     });
     card.addEventListener('pointerleave',()=>{card.style.transform='';});
   });
+})();
+</script>
+
+<script>
+(function(){
+  if(typeof THREE==='undefined')return;
+  const cv=document.getElementById('scene4'); if(!cv)return;
+  const host=cv.parentElement;
+  const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.02;
+  const scene=new THREE.Scene();
+  let W=host.clientWidth,H=540; const D=5.2;
+  const cam=new THREE.OrthographicCamera(-D,D,D,-D,-60,120);
+  function setCam(){const a=W/H;cam.left=-D*a;cam.right=D*a;cam.top=D;cam.bottom=-D;cam.updateProjectionMatrix();}
+  cam.position.set(6.5,7,9); cam.lookAt(0,-0.4,0.2);
+  scene.add(new THREE.HemisphereLight(0xffffff,0xdfe4f5,1.0));
+  const dir=new THREE.DirectionalLight(0xffffff,1.15); dir.position.set(6,13,7); dir.castShadow=true;
+  dir.shadow.mapSize.set(2048,2048); Object.assign(dir.shadow.camera,{left:-14,right:14,top:14,bottom:-14,near:1,far:46}); dir.shadow.camera.updateProjectionMatrix(); scene.add(dir);
+  const grp=new THREE.Group(); scene.add(grp);
+  function box(w,h,d,color,r,m){const me=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:r==null?0.7:r,metalness:m||0}));me.castShadow=true;me.receiveShadow=true;return me;}
+  // desk
+  const desk=box(8.4,0.32,4.4,0xffffff,0.55); grp.add(desk);
+  [[-3.9,-2.0],[3.9,-2.0],[-3.9,2.0],[3.9,2.0]].forEach(([x,z])=>{const l=box(0.2,3.2,0.2,0xe9ebf3,0.6);l.position.set(x,-1.76,z);grp.add(l);});
+  // laptop
+  const lap=new THREE.Group();
+  const base=box(2.5,0.13,1.7,0xc3b6f7,0.45); base.position.y=0.225; lap.add(base);
+  const sc=document.createElement('canvas');sc.width=340;sc.height=214;const xc=sc.getContext('2d');
+  xc.fillStyle='#f4f6fc';xc.fillRect(0,0,340,214);
+  xc.fillStyle='#003CF0';xc.fillRect(0,0,340,30);xc.fillStyle='#fff';xc.font='bold 13px Inter,Arial';xc.fillText('NimbusPost · Orders',12,20);
+  ['#2557f6','#5b8bff','#9bb4ff'].forEach((c,i)=>{xc.fillStyle=c;roundRect(xc,16+i*104,44,90,70,10);xc.fill();});
+  xc.fillStyle='#dde3f2';[150,170,190].forEach((y,i)=>{xc.fillRect(16,y,(i==0?300:i==1?220:260),9);});
+  function roundRect(c,a,b,w,h,r){c.beginPath();c.moveTo(a+r,b);c.arcTo(a+w,b,a+w,b+h,r);c.arcTo(a+w,b+h,a,b+h,r);c.arcTo(a,b+h,a,b,r);c.arcTo(a,b,a+w,b,r);c.closePath();}
+  const stex=new THREE.CanvasTexture(sc);stex.encoding=THREE.sRGBEncoding;
+  const screen=box(2.5,1.55,0.1,0x241f44,0.4);
+  const face=new THREE.Mesh(new THREE.PlaneGeometry(2.3,1.42),new THREE.MeshBasicMaterial({map:stex}));face.position.z=0.06;
+  const scrG=new THREE.Group();scrG.add(screen);scrG.add(face);scrG.position.set(0,0.98,-0.78);scrG.rotation.x=-0.4;lap.add(scrG);
+  lap.position.set(1.4,0,-0.1);lap.rotation.y=-0.32;grp.add(lap);
+  // keyboard + mouse
+  const kb=box(1.7,0.07,0.78,0xeef0f7,0.6);kb.position.set(-0.8,0.2,1.0);kb.rotation.y=0.1;grp.add(kb);
+  const mo=box(0.32,0.09,0.5,0xeef0f7,0.6);mo.position.set(0.55,0.2,1.15);grp.add(mo);
+  // monitor stand + books
+  const stand=box(1.5,0.12,0.55,0xe7e9f2,0.6);stand.position.set(-2.7,0.22,-0.95);grp.add(stand);
+  [0x2557f6,0x9bb4ff,0xcfd8f5].forEach((c,i)=>{const b=box(0.14,0.95,0.72,c,0.7);b.position.set(-3.0+i*0.17,0.7,-0.95);b.rotation.z=0.04*i;grp.add(b);});
+  // cardboard parcels (on-brand)
+  const kraftTop=new THREE.MeshStandardMaterial({color:0xc79a5e,roughness:0.95});
+  const kraft=new THREE.MeshStandardMaterial({color:0xb98a4d,roughness:0.95});
+  function parcel(w,h,d,x,y,z,ry){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),[kraft,kraft,kraftTop,kraft,kraft,kraft]);m.position.set(x,y,z);m.rotation.y=ry;m.castShadow=true;m.receiveShadow=true;grp.add(m);
+    const tape=new THREE.Mesh(new THREE.BoxGeometry(w*1.02,0.04,d*0.26),new THREE.MeshStandardMaterial({color:0xe9dab4,roughness:0.5}));tape.position.set(x,y+h/2,z);tape.rotation.y=ry;grp.add(tape);return m;}
+  parcel(1.2,0.85,1.2, 3.05,0.55,1.0, 0.3);
+  parcel(0.85,0.62,0.85, 3.05,1.27,1.0, -0.2);
+  parcel(1.0,0.7,1.0, 2.5,0.52,-1.2, 0.15);
+  // shadow catcher
+  const gp=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.ShadowMaterial({opacity:0.13}));gp.rotation.x=-Math.PI/2;gp.position.y=-3.4;gp.receiveShadow=true;scene.add(gp);
+  // resize + parallax
+  function resize(){W=host.clientWidth;H=540;renderer.setSize(W,H,false);setCam();}
+  window.addEventListener('resize',resize);resize();
+  let tx=0,ty=0,rx=0,ry=0,seen=false;
+  host.addEventListener('pointermove',e=>{const r=host.getBoundingClientRect();tx=(e.clientX-r.left)/r.width-0.5;ty=(e.clientY-r.top)/r.height-0.5;seen=true;});
+  host.addEventListener('pointerleave',()=>{tx=0;ty=0;});
+  grp.rotation.x=0; const baseY=-0.15;
+  (function loop(){rx+=((-ty*0.16)-rx)*0.06;ry+=((tx*0.34)-ry)*0.06;grp.rotation.x=rx;grp.rotation.y=ry;renderer.render(scene,cam);requestAnimationFrame(loop);})();
 })();
 </script>
 </body>
