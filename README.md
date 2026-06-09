@@ -1,2 +1,3 @@
 # Nimbus-creative-vote
-Internal tool for creative voting
+
+Simple hello page.
