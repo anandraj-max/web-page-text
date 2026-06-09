@@ -323,6 +323,32 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fflate/0.7.4/umd/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+<script>
+window.loadNimbusLaptop=function(cb){
+  if(typeof THREE==='undefined'||!THREE.FBXLoader){console.warn('FBXLoader missing');return;}
+  // glowing NimbusPost dashboard for the screen
+  const c=document.createElement('canvas');c.width=512;c.height=320;const x=c.getContext('2d');
+  x.fillStyle='#f5f7fc';x.fillRect(0,0,512,320);
+  x.fillStyle='#1f47ff';x.fillRect(0,0,512,48);x.fillStyle='#fff';x.font='bold 22px Inter,Arial';x.fillText('NimbusPost · Dashboard',18,32);
+  ['#2557f6','#5b8bff','#9bb4ff'].forEach((col,i)=>{x.fillStyle=col;x.fillRect(24+i*160,72,140,112);});
+  x.fillStyle='#dde3f2';[212,242,272].forEach((y,i)=>x.fillRect(24,y,(i==0?460:i==1?320:400),16));
+  const ui=new THREE.CanvasTexture(c);ui.encoding=THREE.sRGBEncoding;
+  const bodyMat=new THREE.MeshStandardMaterial({color:0xc4c9d2,roughness:0.4,metalness:0.62});
+  const screenMat=new THREE.MeshStandardMaterial({color:0x0c1330,roughness:0.25,metalness:0.2,emissive:0x16277a,emissiveIntensity:0.85,map:ui,emissiveMap:ui});
+  new THREE.FBXLoader().load('assets/laptop.fbx',function(obj){
+    obj.traverse(function(o){ if(o.isMesh){ o.castShadow=true;o.receiveShadow=true;
+      const pick=function(m){const nm=(((m&&m.name)||o.name||'')+'').toLowerCase();return (nm.indexOf('screen')>=0||nm.indexOf('glass')>=0||nm.indexOf('display')>=0||nm.indexOf('lcd')>=0||/(^|[^0-9])2([^0-9]|$)/.test(nm))?screenMat:bodyMat;};
+      o.material=Array.isArray(o.material)?o.material.map(pick):pick(o.material);
+    }});
+    const bb=new THREE.Box3().setFromObject(obj);const size=new THREE.Vector3();bb.getSize(size);const ctr=new THREE.Vector3();bb.getCenter(ctr);
+    const maxd=Math.max(size.x,size.y,size.z)||1; obj.position.sub(ctr);
+    const wrap=new THREE.Group();wrap.add(obj);wrap.scale.setScalar(1/maxd);
+    try{cb(wrap);}catch(e){console.warn(e);}
+  },undefined,function(err){console.warn('laptop FBX failed',err);});
+};
+</script>
 <script>
 (function(){
   const canvas=document.getElementById('scene');
@@ -589,22 +615,8 @@
 
   // ---- laptop ----
   const lap=new THREE.Group();
-  const matLap=M(0xc7bcf5,0.34,0.18), matLapDark=M(0x2a2550,0.45,0.25);
-  const base=box(2.7,0.14,1.85,matLap); base.position.y=0.23; lap.add(base);
-  const tp=box(1.0,0.02,0.62,M(0xb6a9ef,0.3,0.2)); tp.position.set(0,0.31,0.45); lap.add(tp);
-  const kbd=box(2.2,0.02,0.7,M(0x2a2550,0.5)); kbd.position.set(0,0.31,-0.35); lap.add(kbd);
-  // screen
-  const sc=document.createElement('canvas');sc.width=360;sc.height=226;const xc=sc.getContext('2d');
-  function rr(c,a,b,w,h,r){c.beginPath();c.moveTo(a+r,b);c.arcTo(a+w,b,a+w,b+h,r);c.arcTo(a+w,b+h,a,b+h,r);c.arcTo(a,b+h,a,b,r);c.arcTo(a,b,a+w,b,r);c.closePath();}
-  xc.fillStyle='#f5f7fc';xc.fillRect(0,0,360,226);
-  xc.fillStyle='#003CF0';xc.fillRect(0,0,360,32);xc.fillStyle='#fff';xc.font='bold 14px Inter,Arial';xc.fillText('NimbusPost · Orders',12,21);
-  ['#2557f6','#5b8bff','#9bb4ff'].forEach((c,i)=>{xc.fillStyle=c;rr(xc,16+i*112,46,96,74,12);xc.fill();});
-  xc.fillStyle='#e0e6f3';[154,176,198].forEach((y,i)=>{rr(xc,16,y,(i==0?320:i==1?230:280),11,5);xc.fill();});
-  const stex=new THREE.CanvasTexture(sc);stex.encoding=THREE.sRGBEncoding;
-  const panel=box(2.7,1.68,0.1,matLapDark);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(2.46,1.5),new THREE.MeshBasicMaterial({map:stex}));face.position.z=0.056;
-  const scrG=new THREE.Group();scrG.add(panel);scrG.add(face);scrG.position.set(0,1.02,-0.86);scrG.rotation.x=-0.41;lap.add(scrG);
-  lap.position.set(1.45,0,0.0);lap.rotation.y=-0.34;grp.add(lap);
+  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(2.9); m.rotation.y=-0.1; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
+  lap.position.set(1.55,0.16,0.0);lap.rotation.y=-0.34;grp.add(lap);
 
   // ---- monitor (left-back) ----
   const mon=new THREE.Group();
@@ -737,17 +749,8 @@
 
   // ---- floating laptop (not physics) ----
   const lap=new THREE.Group();
-  const matLapBody=new THREE.MeshStandardMaterial({color:0xd2d6e0,roughness:0.4,metalness:0.5});
-  const base=new THREE.Mesh(new THREE.BoxGeometry(3.0,0.16,2.0),matLapBody); base.castShadow=true; lap.add(base);
-  const sc=document.createElement('canvas');sc.width=360;sc.height=226;const xc=sc.getContext('2d');
-  xc.fillStyle='#f5f7fc';xc.fillRect(0,0,360,226);xc.fillStyle='#1f47ff';xc.fillRect(0,0,360,34);xc.fillStyle='#fff';xc.font='bold 15px Inter,Arial';xc.fillText('NimbusPost · Dashboard',12,23);
-  ['#2557f6','#5b8bff','#9bb4ff'].forEach((c,i)=>{xc.fillStyle=c;xc.fillRect(16+i*112,48,96,72);});
-  xc.fillStyle='#dde3f2';[150,172,194].forEach((y,i)=>xc.fillRect(16,y,(i==0?320:i==1?230:280),11));
-  const stex=new THREE.CanvasTexture(sc);stex.encoding=THREE.sRGBEncoding;
-  const panel=new THREE.Mesh(new THREE.BoxGeometry(3.0,1.9,0.1),new THREE.MeshStandardMaterial({color:0x1a1a28,roughness:0.4,metalness:0.3}));panel.castShadow=true;
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(2.78,1.72),new THREE.MeshBasicMaterial({map:stex}));face.position.z=0.056;
-  const scrG=new THREE.Group();scrG.add(panel);scrG.add(face);scrG.position.set(0,1.04,-0.94);scrG.rotation.x=-0.18;lap.add(scrG);
-  const lapBaseY=2.0+2*HH+0.55; lap.position.set(0,lapBaseY,0.1); scene.add(lap);
+  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(3.4); m.rotation.y=0; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
+  const lapBaseY=2.0+2*HH+0.4; lap.position.set(0,lapBaseY,0.1); scene.add(lap);
 
   // ---- pointer -> world plane ----
   const ray=new THREE.Raycaster(); const ndc=new THREE.Vector2(); const plane=new THREE.Plane(new THREE.Vector3(0,0,1),0);
