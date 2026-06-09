@@ -68,43 +68,56 @@
   .scrollcue .m{width:22px;height:34px;border:1.5px solid var(--ink-3);border-radius:12px;position:relative;opacity:.6}
   .scrollcue .m::after{content:"";position:absolute;left:50%;top:7px;width:3px;height:6px;border-radius:2px;background:var(--ink-3);transform:translateX(-50%);animation:dot 1.6s infinite}
   @keyframes dot{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}100%{opacity:0;transform:translate(-50%,9px)}}
-  /* ===== SOLUTIONS (Stripe-style bento) ===== */
-  .solutions{background:linear-gradient(180deg,var(--cream),#ffffff);padding:120px 0 130px;position:relative;z-index:5}
-  .solutions .head{max-width:680px;margin:0 auto 54px;text-align:center}
-  .solutions .head h2{font-family:'Inter',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:600;letter-spacing:-.025em;line-height:1.1}
+  /* ===== WHY UPGRADE (interactive cards) ===== */
+  .solutions{background:linear-gradient(180deg,var(--cream),#ffffff);padding:118px 0 130px;position:relative;z-index:5}
+  .solutions .head{max-width:760px;margin:0 auto 56px;text-align:center}
+  .solutions .head h2{font-family:'Inter',sans-serif;font-size:clamp(32px,4.6vw,52px);font-weight:700;letter-spacing:-.03em;line-height:1.08;color:var(--ink)}
   .solutions .head p{color:var(--ink-2);font-size:18px;margin-top:16px}
-  .bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:200px;gap:18px;perspective:1200px}
-  .card{position:relative;display:flex;flex-direction:column;border-radius:22px;padding:26px;background:#fff;border:1px solid var(--line);overflow:hidden;transform-style:preserve-3d;transition:transform .14s ease-out,box-shadow .25s ease,border-color .25s ease;will-change:transform;box-shadow:0 1px 3px rgba(23,24,43,.05)}
-  .card:hover{box-shadow:0 24px 54px rgba(23,24,43,.14);border-color:rgba(0,60,240,.35)}
-  .card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(0,60,240,.13),transparent 55%);opacity:0;transition:opacity .3s;pointer-events:none}
+  .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;perspective:1300px}
+  @media(max-width:920px){.bento{grid-template-columns:1fr}}
+  .card{position:relative;display:flex;flex-direction:column;border-radius:22px;padding:28px;background:#f7f9ff;border:1px solid #e8edfb;overflow:hidden;transform-style:preserve-3d;transition:transform .14s ease-out,box-shadow .25s ease,border-color .25s ease;will-change:transform;min-height:340px}
+  .card:hover{box-shadow:0 26px 56px rgba(23,24,43,.13);border-color:rgba(0,60,240,.32)}
+  .card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),rgba(0,60,240,.12),transparent 55%);opacity:0;transition:opacity .3s;pointer-events:none}
   .card:hover::after{opacity:1}
-  .card .tag{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;position:relative;z-index:2}
-  .card h3{font-size:19px;font-weight:600;letter-spacing:-.01em;max-width:18ch;position:relative;z-index:2}
-  .card p{font-size:14px;color:var(--ink-2);margin-top:8px;position:relative;z-index:2;max-width:32ch}
-  .c1{grid-column:span 4;grid-row:span 2}.c1 h3{font-size:26px;max-width:14ch}
-  .c2{grid-column:span 2;grid-row:span 2}
-  .c3{grid-column:span 2}.c4{grid-column:span 2}.c5{grid-column:span 2}
-  .c6{grid-column:span 6}
-  @media(max-width:860px){.bento{grid-template-columns:1fr;grid-auto-rows:auto}.c1,.c2,.c3,.c4,.c5,.c6{grid-column:auto;grid-row:auto;min-height:200px}}
-  .card.grad{color:#fff;border:none;background:linear-gradient(135deg,#003CF0,#3D6BFF 55%,#789dff)}
-  .card.grad p{color:rgba(255,255,255,.85)}.card.grad .tag{color:rgba(255,255,255,.92)}
-  .route{margin-top:auto}.route .dash{stroke-dasharray:6 8;animation:flow 2.4s linear infinite}
-  @keyframes flow{to{stroke-dashoffset:-56}}
-  .route .pkt{animation:movePkt 3.4s ease-in-out infinite}
-  @keyframes movePkt{0%{transform:translateX(0)}100%{transform:translateX(250px)}}
-  .panel{margin-top:16px;border:1px solid var(--line);border-radius:14px;padding:14px;background:#fafbff;position:relative;z-index:2}
-  .panel .r{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--ink-2)}.panel .r b{color:var(--ink);font-weight:600}
-  .meter{height:8px;border-radius:99px;background:#e9edff;margin-top:10px;overflow:hidden}
-  .meter i{display:block;height:100%;width:30%;background:linear-gradient(90deg,#003CF0,#6f93ff);border-radius:99px;animation:fill 3.6s ease-in-out infinite}
-  @keyframes fill{0%{width:20%}50%{width:84%}100%{width:20%}}
-  .track{display:flex;align-items:center;margin-top:auto;position:relative;z-index:2}
-  .track .node{width:12px;height:12px;border-radius:50%;background:#cfd8f5;flex:0 0 auto}.track .node.done{background:var(--accent)}
-  .track .seg{flex:1;height:3px;background:#e3e9f5;position:relative;overflow:hidden}
-  .track .seg i{position:absolute;inset:0;width:40%;background:var(--accent);animation:slide 2.6s ease-in-out infinite}
-  @keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}
-  .bignum{font-size:34px;font-weight:700;letter-spacing:-.02em;margin-top:auto;position:relative;z-index:2}.bignum span{color:var(--accent)}
-  .code{margin-top:16px;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.8;color:#e3ecff;position:relative;z-index:2;max-width:420px}
-  .code .k{color:#a8c5ff}.code .s{color:#ffd9a8}
+  .card .tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:#e6edff;padding:6px 12px;border-radius:999px;margin-bottom:16px;position:relative;z-index:2}
+  .card h3{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2;max-width:17ch;position:relative;z-index:2;color:var(--ink)}
+  .card p{font-size:14.5px;color:var(--ink-2);margin-top:10px;position:relative;z-index:2}
+  .viz{margin-top:auto;position:relative;z-index:2;padding-top:24px}
+  /* payout */
+  .payout{display:flex;align-items:center;gap:10px}
+  .pcard{flex:1;background:#fff;border:1px solid #e8edfb;border-radius:12px;padding:12px 14px}
+  .pcard .lab{font-size:10.5px;color:var(--ink-3)} .pcard .amt{font-size:17px;font-weight:700;color:var(--ink);margin-top:3px}
+  .pcard .chip{display:inline-block;margin-top:8px;font-size:10px;font-weight:600;color:var(--ink-2);background:#eef1f8;border-radius:6px;padding:2px 8px}
+  .pcard.ok{background:#f0fdf4;border-color:#bbf7d0} .pcard.ok .lab{color:#16a34a} .pcard.ok .chip{background:#dcfce7;color:#16a34a}
+  .payout .arrow{color:var(--accent);font-size:20px;font-weight:700}
+  /* weight */
+  .weigh{display:flex;gap:14px;align-items:center}
+  .weigh .box{font-size:44px;line-height:1;filter:drop-shadow(0 6px 10px rgba(23,24,43,.12))}
+  .weigh .rows{flex:1;font-size:12.5px}
+  .weigh .wr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eef1f8} .weigh .wr:last-child{border:none}
+  .weigh .wr b{color:var(--ink)} .weigh .save{color:#16a34a;font-weight:700}
+  /* couriers + map */
+  .couriers{display:flex;gap:8px;flex-wrap:wrap}
+  .couriers .lg{background:#fff;border:1px solid #e8edfb;border-radius:8px;padding:7px 11px;font-size:11.5px;font-weight:800;color:#1f3a8a;letter-spacing:.02em}
+  .mapwrap{margin-top:14px;height:92px;border-radius:12px;background:#fff;border:1px solid #e8edfb;position:relative;overflow:hidden;background-image:radial-gradient(#d4ddf5 1.2px,transparent 1.4px);background-size:14px 14px;background-position:8px 8px}
+  .pin{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);animation:ping 2.2s infinite}
+  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(0,60,240,.45)}70%{box-shadow:0 0 0 11px rgba(0,60,240,0)}100%{box-shadow:0 0 0 0 rgba(0,60,240,0)}}
+  /* checkout mini */
+  .waba{background:#fff;border:1px solid #e8edfb;border-radius:14px;padding:13px;display:flex;gap:11px;align-items:center}
+  .waba .ic{width:32px;height:32px;border-radius:9px;background:#dcfce7;display:grid;place-items:center;color:#16a34a;font-size:16px;flex:0 0 auto}
+  .waba .tx{font-size:12.5px;color:var(--ink-2)} .waba .tx b{display:block;color:var(--ink);font-size:13.5px}
+  /* KAM */
+  .kam{background:#fff;border:1px solid #e8edfb;border-radius:16px;padding:15px;box-shadow:0 10px 24px rgba(23,24,43,.06)}
+  .kam .top{font-size:12px;color:var(--ink-3);margin-bottom:11px;font-weight:600}
+  .kam .who{display:flex;align-items:center;gap:10px}
+  .kam .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3D6BFF,#003CF0);flex:0 0 auto}
+  .kam .nm{font-weight:700;font-size:14px} .kam .rl{font-size:11.5px;color:var(--ink-3)}
+  .kam .on{margin-left:auto;font-size:10px;font-weight:700;color:#16a34a;background:#dcfce7;border-radius:99px;padding:3px 9px}
+  .kam .ct{font-size:12px;color:var(--ink-2);margin-top:11px;display:flex;flex-direction:column;gap:5px}
+  /* scale */
+  .scalest{display:flex;gap:26px}
+  .scalest .n{font-size:30px;font-weight:800;color:var(--accent);letter-spacing:-.02em}
+  .scalest .l{font-size:12px;color:var(--ink-3);margin-top:2px}
   .rail{position:fixed;left:0;top:0;height:3px;width:100%;z-index:70;background:transparent}
   .rail span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
 </style>
@@ -159,55 +172,81 @@
   </div>
 </div>
 
-<!-- SECTION 3: Stripe-style bento solutions -->
+<!-- SECTION 3: Why Upgrade — interactive cards -->
 <section class="solutions">
   <div class="wrap">
     <div class="head">
-      <h2>Flexible solutions for every business model.</h2>
-      <p>Ship, track, and scale with a complete set of logistics tools — designed to work individually or together.</p>
+      <h2>Why Upgrade to NimbusPost</h2>
+      <p>Improve your operations across shipping costs, cash flow, and customer support.</p>
     </div>
     <div class="bento" id="bento">
-      <div class="card grad c1">
-        <span class="tag">Shipping</span>
-        <h3>Accept and optimise deliveries globally — online and in person</h3>
-        <p>Route every order to the best of 25+ couriers, automatically.</p>
-        <svg class="route" width="100%" height="80" viewBox="0 0 300 80" fill="none" preserveAspectRatio="none">
-          <path d="M10 60 C 90 10, 180 80, 290 24" stroke="rgba(255,255,255,.5)" stroke-width="2" class="dash"/>
-          <circle cx="10" cy="60" r="5" fill="#fff"/>
-          <g class="pkt"><rect x="4" y="54" width="13" height="13" rx="2.5" fill="#fff"/></g>
-          <circle cx="290" cy="24" r="5" fill="#fff"/>
-        </svg>
+      <div class="card">
+        <span class="tag">COD Remittance</span>
+        <h3>Get Your Payments Faster</h3>
+        <p>Access your COD payouts in as quickly as 1 day. Also get T+3 remittance without paying extra.</p>
+        <div class="viz"><div class="payout">
+          <div class="pcard"><div class="lab">Payout Initiated</div><div class="amt">₹2,45,000</div><span class="chip">T+1</span></div>
+          <div class="arrow">→</div>
+          <div class="pcard ok"><div class="lab">Payout Credited</div><div class="amt">₹2,45,000</div><span class="chip">✓ Completed</span></div>
+        </div></div>
       </div>
-      <div class="card c2">
-        <span class="tag">Billing</span>
-        <h3>Enable any fulfillment model</h3>
-        <div class="panel">
-          <div class="r"><span>Standard plan</span><b>Billed monthly</b></div>
-          <div class="r"><span>Per label</span><b>&#8377;0.95 / unit</b></div>
-          <div class="r"><span>Usage this month</span><b>Live</b></div>
-          <div class="meter"><i></i></div>
+
+      <div class="card">
+        <span class="tag">Weight Protection</span>
+        <h3>Stop Paying for Weight You Didn’t Ship</h3>
+        <p>Prevent weight discrepancies with SKU-level weight locking. Get deadweight billing up to 1.5 kg volumetric weight.*</p>
+        <div class="viz"><div class="weigh">
+          <div class="box">📦</div>
+          <div class="rows">
+            <div class="wr"><span>Actual Weight</span><b>2.3 kg</b></div>
+            <div class="wr"><span>Billed Weight</span><b>2.3 kg ✓</b></div>
+            <div class="wr"><span>You Save</span><span class="save">1.2 kg ↓</span></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="card">
+        <span class="tag">Customer Experience</span>
+        <h3>More Couriers, More Control</h3>
+        <p>Access 25+ courier partners including Blue Dart, Delhivery, XpressBees, and more for wider coverage.</p>
+        <div class="viz">
+          <div class="couriers"><span class="lg">BLUE DART</span><span class="lg">DELHIVERY</span><span class="lg">XPRESSBEES</span><span class="lg">+25</span></div>
+          <div class="mapwrap">
+            <span class="pin" style="left:34%;top:40%"></span>
+            <span class="pin" style="left:58%;top:30%;animation-delay:.5s"></span>
+            <span class="pin" style="left:48%;top:64%;animation-delay:1s"></span>
+            <span class="pin" style="left:70%;top:58%;animation-delay:1.5s"></span>
+            <span class="pin" style="left:22%;top:62%;animation-delay:.8s"></span>
+          </div>
         </div>
-        <p>Flat-rate, usage-based, or hybrid — bill however you grow.</p>
       </div>
-      <div class="card c3">
-        <span class="tag">Automation</span>
-        <h3>Automate courier selection</h3>
-        <div class="track"><span class="node done"></span><span class="seg"><i></i></span><span class="node"></span><span class="seg"><i></i></span><span class="node"></span></div>
+
+      <div class="card">
+        <span class="tag">Checkout Product</span>
+        <h3>A Checkout That Reduces RTOs</h3>
+        <p>Order confirmation and address verification via WhatsApp/IVR, and custom blocking of risky pincodes — all before the package leaves.</p>
+        <div class="viz"><div class="waba"><div class="ic">✓</div><div class="tx"><b>Order confirmed</b>via WhatsApp · address verified</div></div></div>
       </div>
-      <div class="card c4">
-        <span class="tag">Experience</span>
-        <h3>Branded tracking, end to end</h3>
-        <div class="track"><span class="node done"></span><span class="seg"><i></i></span><span class="node done"></span><span class="seg"><i></i></span><span class="node"></span></div>
+
+      <div class="card">
+        <span class="tag">Support</span>
+        <h3>A Real Person, Not a Ticket Queue</h3>
+        <p>Every seller gets a dedicated Key Account Manager from Day 1, ensuring faster resolutions and personalized support whenever needed.</p>
+        <div class="viz"><div class="kam">
+          <div class="top">Your Key Account Manager</div>
+          <div class="who"><div class="av"></div><div><div class="nm">Rahul Sharma</div><div class="rl">Key Account Manager</div></div><span class="on">Online</span></div>
+          <div class="ct"><span>📞&nbsp; +91 98765 43210</span><span>✉&nbsp; rahul.sharma@nimbuspost.com</span></div>
+        </div></div>
       </div>
-      <div class="card c5">
-        <span class="tag">Payments</span>
-        <h3>Instant COD remittance</h3>
-        <div class="bignum">&#8377;<span>4.6L</span>+</div>
-      </div>
-      <div class="card grad c6">
-        <span class="tag">Platform</span>
-        <h3>Embed shipping in your platform</h3>
-        <div class="code"><span class="k">const</span> rate = <span class="k">await</span> nimbus.<span class="s">rates</span>.create({<br>&nbsp;&nbsp;from: <span class="s">"110001"</span>, to: <span class="s">"560001"</span>, weight: <span class="s">0.5</span><br>});</div>
+
+      <div class="card">
+        <span class="tag">Scale</span>
+        <h3>Built for 3x Your Current Volume</h3>
+        <p>From festive sales to everyday scale, leverage the expertise of delivering 150M+ shipments and powering 1,00,000+ businesses.</p>
+        <div class="viz"><div class="scalest">
+          <div><div class="n">150M+</div><div class="l">Shipments delivered</div></div>
+          <div><div class="n">1,00,000+</div><div class="l">Businesses powered</div></div>
+        </div></div>
       </div>
     </div>
   </div>
