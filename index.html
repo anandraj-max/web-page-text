@@ -8,21 +8,21 @@
   :root{
     --blue:#2557f6; --blue-d:#1e40af;
     --ink:#0f1c3f; --ink-2:#475569; --ink-3:#7c899e;
-    --bg:#ffffff; --bg-soft:#eef3ff; --line:#e3e9f5;
-    --shadow-sm:0 2px 10px rgba(18,38,90,.06);
+    --bg:#ffffff; --line:#e3e9f5;
     --maxw:1180px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+  html,body{height:100%}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   a{text-decoration:none;color:inherit}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;border-radius:10px;padding:13px 26px;cursor:pointer;border:none;transition:.18s}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;border-radius:12px;padding:14px 30px;cursor:pointer;border:none;transition:.2s;box-shadow:0 8px 24px rgba(37,87,246,.28)}
   .btn-primary{background:var(--blue);color:#fff}
-  .btn-primary:hover{background:var(--blue-d)}
-  h1{line-height:1.15;letter-spacing:-.02em}
+  .btn-primary:hover{background:var(--blue-d);transform:translateY(-2px);box-shadow:0 12px 30px rgba(37,87,246,.4)}
+  h1{line-height:1.12;letter-spacing:-.025em}
 
   /* ===== HEADER ===== */
-  header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);border-bottom:1px solid rgba(227,233,245,.7)}
   .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
   .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px}
   .brand .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--blue),#5b8bff);display:grid;place-items:center;color:#fff;font-size:16px}
@@ -34,17 +34,22 @@
   @media(max-width:900px){.menu,.nav-right .login{display:none}}
 
   /* ===== HERO ===== */
-  .hero{background:linear-gradient(180deg,#eef3ff 0%,#f6f9ff 100%);padding:64px 0 60px;text-align:center}
-  .hero h1{font-size:54px;font-weight:800}
-  .hero h1 .b{color:var(--blue)}
-  .hero p.sub{max-width:560px;margin:18px auto 26px;color:var(--ink-2);font-size:17px}
-  .hero .illus{margin:34px auto 10px;max-width:720px}
-  .hero .count{color:var(--ink-3);font-weight:600;font-size:15px;margin-top:20px}
+  .hero{position:relative;height:100vh;min-height:640px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+  /* animated environment gradient (changes with cursor) */
+  #env{position:absolute;inset:0;z-index:0;background:
+      radial-gradient(900px 600px at var(--mx,50%) var(--my,35%), #e9f0ff 0%, #f3f7ff 40%, #ffffff 100%);
+      transition:background .25s ease-out}
+  #scene{position:absolute;inset:0;z-index:1;display:block;pointer-events:none}
+  .hero-content{position:relative;z-index:2;padding-top:40px}
+  .hero .pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue);background:rgba(37,87,246,.08);border:1px solid rgba(37,87,246,.18);padding:7px 16px;border-radius:999px;margin-bottom:22px;backdrop-filter:blur(4px)}
+  .hero .pill .dot{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+  .hero h1{font-size:64px;font-weight:800}
+  .hero h1 .b{background:linear-gradient(90deg,#2557f6,#5b8bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p.sub{max-width:560px;margin:20px auto 30px;color:var(--ink-2);font-size:18px}
+  .hero .count{color:var(--ink-3);font-weight:600;font-size:14px;margin-top:32px}
   .hero .count b{color:var(--ink)}
-  @media(max-width:700px){.hero h1{font-size:34px}}
-
-  /* image placeholder (empty) */
-  .iso{width:100%;height:300px;border-radius:20px;background:linear-gradient(135deg,#f0f5ff,#e3ecff);border:1px solid var(--line)}
+  .hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:2;font-size:12px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+  @media(max-width:700px){.hero h1{font-size:38px}}
 </style>
 </head>
 <body>
@@ -54,13 +59,8 @@
   <div class="wrap nav">
     <div class="brand"><span class="logo">N</span><span>Nimbus<b>Post</b></span></div>
     <ul class="menu">
-      <li><a href="#">Products</a></li>
-      <li><a href="#">Solutions</a></li>
-      <li><a href="#">Partners</a></li>
-      <li><a href="#">Pricing</a></li>
-      <li><a href="#">Resources</a></li>
-      <li><a href="#">Company</a></li>
-      <li><a href="#">Track Order</a></li>
+      <li><a href="#">Products</a></li><li><a href="#">Solutions</a></li><li><a href="#">Partners</a></li>
+      <li><a href="#">Pricing</a></li><li><a href="#">Resources</a></li><li><a href="#">Company</a></li><li><a href="#">Track Order</a></li>
     </ul>
     <div class="nav-right">
       <a href="#" class="login">Login</a>
@@ -69,18 +69,190 @@
   </div>
 </header>
 
-<!-- HERO -->
+<!-- HERO with 3D interactive scene -->
 <section class="hero">
-  <div class="wrap">
+  <div id="env"></div>
+  <canvas id="scene"></canvas>
+  <div class="hero-content">
+    <span class="pill"><span class="dot"></span> Live logistics network</span>
     <h1>eCommerce Logistics<br><span class="b">Built for the Bold</span></h1>
     <p class="sub">Run your orders, ship through one platform, and grow without limits — engineered for speed, scale, and simplicity.</p>
     <button class="btn btn-primary">Try For FREE</button>
-    <div class="illus">
-      <div class="iso"></div>
-    </div>
     <div class="count"><b>100,000+</b> Entrepreneurs choose NimbusPost</div>
   </div>
+  <div class="hint">move your cursor</div>
 </section>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  const canvas = document.getElementById('scene');
+  const env = document.getElementById('env');
+  const hero = document.querySelector('.hero');
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0xf3f7ff, 14, 34);
+
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0, 16);
+
+  // ---- Lights (soft, light theme) ----
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xcdd9ff, 1.05);
+  scene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+  dir.position.set(6, 10, 8);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(1024,1024);
+  dir.shadow.camera.near = 1; dir.shadow.camera.far = 40;
+  scene.add(dir);
+  // cursor-following accent light (gives moving glossy highlights)
+  const cursorLight = new THREE.PointLight(0x3b82f6, 60, 40, 2);
+  cursorLight.position.set(0,0,8);
+  scene.add(cursorLight);
+
+  // soft ground to catch shadows
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(120,120),
+    new THREE.ShadowMaterial({opacity:0.08})
+  );
+  ground.rotation.x = -Math.PI/2; ground.position.y = -7; ground.receiveShadow = true;
+  scene.add(ground);
+
+  // ---- Floating "parcels" ----
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const palette = [0x2557f6, 0x4f7bff, 0x86a9ff, 0xbcd0ff, 0xffffff, 0x6ee7f9, 0x9bb4ff];
+  const geom = new THREE.BoxGeometry(1,1,1);
+  // bevel-ish: round corners via slight scale + edges
+  const boxes = [];
+  const COUNT = 46;
+  for(let i=0;i<COUNT;i++){
+    const c = palette[i % palette.length];
+    const mat = new THREE.MeshStandardMaterial({
+      color:c, metalness:0.25, roughness:0.32,
+      emissive:new THREE.Color(c).multiplyScalar(0.04)
+    });
+    const m = new THREE.Mesh(geom, mat);
+    const s = 0.6 + Math.random()*1.6;
+    m.scale.set(s, s, s);
+    const home = new THREE.Vector3(
+      (Math.random()-0.5)*26,
+      (Math.random()-0.5)*15,
+      (Math.random()-0.5)*10 - 2
+    );
+    m.position.copy(home);
+    m.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+    m.castShadow = true; m.receiveShadow = true;
+    m.userData = {
+      home: home.clone(),
+      offset: Math.random()*Math.PI*2,
+      bob: 0.3 + Math.random()*0.7,
+      spin: (Math.random()-0.5)*0.4,
+      disp: new THREE.Vector3()
+    };
+    group.add(m);
+    boxes.push(m);
+  }
+
+  // subtle edge wireframe on a few large boxes for "tech" feel
+  boxes.filter(b=>b.scale.x>1.6).forEach(b=>{
+    const e = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geom),
+      new THREE.LineBasicMaterial({color:0x2557f6, transparent:true, opacity:0.25})
+    );
+    b.add(e);
+  });
+
+  // ---- Pointer tracking ----
+  const mouse = new THREE.Vector2(0,0);      // normalized -1..1
+  const target = new THREE.Vector2(0,0);
+  const raycaster = new THREE.Raycaster();
+  const planeZ = new THREE.Plane(new THREE.Vector3(0,0,1), 2); // interaction plane
+  const cursorWorld = new THREE.Vector3();
+  let hasMouse = false;
+
+  function onMove(e){
+    const r = hero.getBoundingClientRect();
+    const x = (e.clientX - r.left)/r.width;
+    const y = (e.clientY - r.top)/r.height;
+    target.x = x*2 - 1;
+    target.y = -(y*2 - 1);
+    hasMouse = true;
+    // environment gradient follows cursor
+    env.style.setProperty('--mx', (x*100).toFixed(1)+'%');
+    env.style.setProperty('--my', (y*100).toFixed(1)+'%');
+  }
+  window.addEventListener('pointermove', onMove, {passive:true});
+  window.addEventListener('pointerdown', onMove, {passive:true});
+
+  // ---- Resize ----
+  function resize(){
+    const w = hero.clientWidth, h = hero.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---- Animation loop ----
+  const tmp = new THREE.Vector3();
+  const clock = new THREE.Clock();
+  function tick(){
+    const t = clock.getElapsedTime();
+    // smooth mouse
+    mouse.x += (target.x - mouse.x)*0.06;
+    mouse.y += (target.y - mouse.y)*0.06;
+
+    // group parallax toward cursor (gaming feel)
+    group.rotation.y += ((mouse.x*0.5) - group.rotation.y)*0.05;
+    group.rotation.x += ((-mouse.y*0.32) - group.rotation.x)*0.05;
+    group.position.x += ((mouse.x*1.6) - group.position.x)*0.04;
+    group.position.y += ((mouse.y*1.0) - group.position.y)*0.04;
+
+    // cursor light + world point for repulsion
+    raycaster.setFromCamera(mouse, camera);
+    raycaster.ray.intersectPlane(planeZ, cursorWorld);
+    cursorLight.position.lerp(new THREE.Vector3(cursorWorld.x, cursorWorld.y, 7), 0.15);
+
+    // per-box motion + cursor repulsion (spring back)
+    for(const b of boxes){
+      const u = b.userData;
+      // gentle continuous float
+      const baseY = u.home.y + Math.sin(t*u.bob + u.offset)*0.5;
+      // repulsion in local-ish world: compare world position to cursor
+      b.getWorldPosition(tmp);
+      const dx = tmp.x - cursorWorld.x;
+      const dy = tmp.y - cursorWorld.y;
+      const d2 = dx*dx + dy*dy;
+      const R = 5.0;
+      if(hasMouse && d2 < R*R){
+        const d = Math.sqrt(d2) || 0.001;
+        const force = (1 - d/R);
+        u.disp.x += (dx/d)*force*0.6;
+        u.disp.y += (dy/d)*force*0.6;
+      }
+      // spring displacement back to 0
+      u.disp.multiplyScalar(0.88);
+      b.position.x += ((u.home.x + u.disp.x) - b.position.x)*0.12;
+      b.position.y += ((baseY + u.disp.y) - b.position.y)*0.12;
+      b.position.z += ((u.home.z) - b.position.z)*0.12;
+      // spin
+      b.rotation.x += u.spin*0.01;
+      b.rotation.y += u.spin*0.013;
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
 </body>
 </html>
