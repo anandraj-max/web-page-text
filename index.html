@@ -128,7 +128,7 @@
 
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=0.92;
   renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 
   const scene=new THREE.Scene();
@@ -138,10 +138,10 @@
   const camera=new THREE.PerspectiveCamera(48,1,0.1,100);
   camera.position.set(0,0,18);
 
-  const hemi=new THREE.HemisphereLight(0xfff6e8,0xcfc6e8,0.6); scene.add(hemi);
-  const dir=new THREE.DirectionalLight(0xfff0d6,0.8); dir.position.set(6,11,9);
+  const hemi=new THREE.HemisphereLight(0xfff6e8,0xcfc6e8,0.5); scene.add(hemi);
+  const dir=new THREE.DirectionalLight(0xfff0d6,0.62); dir.position.set(6,11,9);
   dir.castShadow=true; dir.shadow.mapSize.set(1024,1024); dir.shadow.camera.near=1; dir.shadow.camera.far=46; scene.add(dir);
-  const cursorLight=new THREE.PointLight(0xffe9c4,22,42,2); cursorLight.position.set(0,0,9); scene.add(cursorLight);
+  const cursorLight=new THREE.PointLight(0xffe9c4,16,42,2); cursorLight.position.set(0,0,9); scene.add(cursorLight);
 
   const group=new THREE.Group(); scene.add(group);
 
@@ -266,7 +266,7 @@
 
     raycaster.setFromCamera(mouse,camera);raycaster.ray.intersectPlane(plane,cursorWorld);
     cursorLight.position.lerp(new THREE.Vector3(cursorWorld.x,cursorWorld.y,8),0.15);
-    cursorLight.intensity=lerp(22,9,e);
+    cursorLight.intensity=lerp(16,7,e);
 
     for(const b of boxes){
       const u=b.userData;
