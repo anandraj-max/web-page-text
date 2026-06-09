@@ -403,7 +403,7 @@
   for(let i=0;i<COUNT;i++){
     const m=makeParcel();
     const s=0.72+Math.random()*1.35; m.scale.set(s,s,s);
-    const home=(function(){let x,y;do{x=(Math.random()-0.5)*34;y=(Math.random()-0.5)*18;}while(Math.abs(x)<6.8&&Math.abs(y)<4.4);return new THREE.Vector3(x,y,(Math.random()-0.5)*12-2);})();
+    const home=(function(){let x,y;do{x=(Math.random()-0.5)*38;y=(Math.random()-0.5)*20;}while((x*x)/(11.5*11.5)+(y*y)/(5.4*5.4)<1);return new THREE.Vector3(x,y,(Math.random()-0.5)*12-3);})();
     m.position.copy(home);
     m.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
     const col=i%COLS,rowi=Math.floor(i/COLS);
