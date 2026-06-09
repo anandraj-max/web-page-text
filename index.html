@@ -336,7 +336,7 @@ window.loadNimbusLaptop=function(cb){
   x.fillStyle='#dde3f2';[212,242,272].forEach((y,i)=>x.fillRect(24,y,(i==0?460:i==1?320:400),16));
   const ui=new THREE.CanvasTexture(c);ui.encoding=THREE.sRGBEncoding;
   const bodyMat=new THREE.MeshStandardMaterial({color:0xc4c9d2,roughness:0.4,metalness:0.62});
-  const screenMat=new THREE.MeshStandardMaterial({color:0x0c1330,roughness:0.25,metalness:0.2,emissive:0x16277a,emissiveIntensity:0.85,map:ui,emissiveMap:ui});
+  const screenMat=new THREE.MeshStandardMaterial({color:0x07080d,roughness:0.18,metalness:0.35,emissive:0x0a0f1e,emissiveIntensity:0.25});
   new THREE.FBXLoader().load('assets/laptop.fbx',function(obj){
     obj.traverse(function(o){ if(o.isMesh){ o.castShadow=true;o.receiveShadow=true;
       const pick=function(m){const nm=(((m&&m.name)||o.name||'')+'').toLowerCase();return (nm.indexOf('screen')>=0||nm.indexOf('glass')>=0||nm.indexOf('display')>=0||nm.indexOf('lcd')>=0||/(^|[^0-9])2([^0-9]|$)/.test(nm))?screenMat:bodyMat;};
@@ -618,6 +618,7 @@ window.loadNimbusLaptop=function(cb){
   if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(2.6); m.rotation.y=Math.PI/2; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
   function rr(c,a,b,w,h,r){c.beginPath();c.moveTo(a+r,b);c.arcTo(a+w,b,a+w,b+h,r);c.arcTo(a+w,b+h,a,b+h,r);c.arcTo(a,b+h,a,b,r);c.arcTo(a,b,a+w,b,r);c.closePath();}
   lap.position.set(1.55,0.16,0.0);lap.rotation.y=-0.34;grp.add(lap);
+  const matLapDark=M(0x2a2550,0.45,0.25);
 
   // ---- monitor (left-back) ----
   const mon=new THREE.Group();
@@ -685,7 +686,7 @@ window.loadNimbusLaptop=function(cb){
 
 <script>
 (function(){
-  if(typeof THREE==='undefined'||typeof CANNON==='undefined')return;
+  if(typeof THREE==='undefined')return;
   const cv=document.getElementById('scene5'); if(!cv)return;
   const host=cv.parentElement, glowEl=document.getElementById('glowB');
   const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
@@ -720,80 +721,66 @@ window.loadNimbusLaptop=function(cb){
   const faceMats=[mSide,mSide,mTop,mBot,mFront,mSide];
   const tapeMat=new THREE.MeshStandardMaterial({color:0xe9dab4,roughness:0.5});
 
-  // ---- physics world ----
-  const world=new CANNON.World(); world.gravity.set(0,-18,0); world.broadphase=new CANNON.SAPBroadphase(world); world.solver.iterations=22; world.solver.tolerance=0.001; world.allowSleep=true; world.defaultContactMaterial.friction=0.8;
-  const pmat=new CANNON.Material('p'); world.addContactMaterial(new CANNON.ContactMaterial(pmat,pmat,{friction:0.85,restitution:0.0}));
-  const ground=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:pmat}); ground.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2); world.addBody(ground);
-  function pl(axis,angle,px,pz){const b=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:pmat});b.quaternion.setFromAxisAngle(new CANNON.Vec3(axis[0],axis[1],axis[2]),angle);b.position.set(px,0,pz);world.addBody(b);}
-  pl([1,0,0],0,0,-5.5);            // back wall
-  pl([0,1,0],Math.PI,0,6.5);        // front wall
-  pl([0,1,0],Math.PI/2,-10,0);      // left
-  pl([0,1,0],-Math.PI/2,10,0);      // right
-
-  // ---- box stack (pyramid: 4 bottom, 3 top) ----
+  // ---- box stack (pyramid: 4 bottom, 3 top) — spring interactive, no physics fly-out ----
   const HW=1.0,HH=0.72,HD=0.82;
   const layout=[
-    [-3.35,HH+0.02,0],[-1.12,HH+0.02,0],[1.12,HH+0.02,0],[3.35,HH+0.02,0],
-    [-2.24,HH+2*HH+0.06,0],[0,HH+2*HH+0.06,0],[2.24,HH+2*HH+0.06,0]
+    [-3.35,HH,0],[-1.12,HH,0],[1.12,HH,0],[3.35,HH,0],
+    [-2.24,HH*3,0],[0,HH*3,0],[2.24,HH*3,0]
   ];
   const items=[];
-  layout.forEach(p=>{
+  layout.forEach(function(p){
     const mesh=new THREE.Mesh(new THREE.BoxGeometry(2*HW,2*HH,2*HD),faceMats); mesh.castShadow=true; mesh.receiveShadow=true;
     const tape=new THREE.Mesh(new THREE.BoxGeometry(2*HW*1.02,0.05,2*HD*0.26),tapeMat); tape.position.y=HH; mesh.add(tape);
-    scene.add(mesh);
-    const body=new CANNON.Body({mass:1.3,material:pmat}); body.addShape(new CANNON.Box(new CANNON.Vec3(HW,HH,HD)));
-    body.position.set(p[0],p[1],p[2]); body.linearDamping=0.3; body.angularDamping=0.55;
-    body.allowSleep=true; body.sleepSpeedLimit=0.4; body.sleepTimeLimit=0.6;
-    world.addBody(body);
-    items.push({mesh,body,home:new CANNON.Vec3(p[0],p[1],p[2])});
+    mesh.position.set(p[0],p[1],p[2]); scene.add(mesh);
+    items.push({mesh:mesh,home:new THREE.Vector3(p[0],p[1],p[2]),off:new THREE.Vector3(),v:new THREE.Vector3(),rot:new THREE.Vector3(),rv:new THREE.Vector3()});
   });
 
-  // ---- floating laptop (not physics) ----
-  const lap=new THREE.Group();
-  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(3.0); m.rotation.y=Math.PI/2; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
-  const lapBaseY=2.0+2*HH+0.4; lap.position.set(0,lapBaseY,0.1); scene.add(lap);
+  // ---- laptop resting on the top-middle box (reacts only on hover) ----
+  const lapBaseY=HH*3+HH+0.02;
+  const lap=new THREE.Group(); lap.position.set(0,lapBaseY,0.05); scene.add(lap);
+  if(window.loadNimbusLaptop) window.loadNimbusLaptop(function(m){ m.scale.multiplyScalar(2.7); m.rotation.y=Math.PI/2; const bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; lap.add(m); });
+  const lapS={off:0,v:0,tilt:0};
 
-  // ---- pointer -> world plane ----
+  // ---- pointer ----
   const ray=new THREE.Raycaster(); const ndc=new THREE.Vector2(); const plane=new THREE.Plane(new THREE.Vector3(0,0,1),0);
-  const cw=new THREE.Vector3(), lastcw=new THREE.Vector3(); let pmove=new THREE.Vector3(); let active=false, hasLast=false;
-  host.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();ndc.x=((e.clientX-r.left)/r.width)*2-1;ndc.y=-(((e.clientY-r.top)/r.height)*2-1);active=true;});
-  host.addEventListener('pointerleave',()=>{active=false;hasLast=false;});
+  const cw=new THREE.Vector3(); let active=false;
+  host.addEventListener('pointermove',function(e){const r=cv.getBoundingClientRect();ndc.x=((e.clientX-r.left)/r.width)*2-1;ndc.y=-(((e.clientY-r.top)/r.height)*2-1);active=true;});
+  host.addEventListener('pointerleave',function(){active=false;});
 
   function resize(){W=host.clientWidth;H=560;renderer.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();}
   window.addEventListener('resize',resize);resize();
 
-  const clock=new THREE.Clock(); let lapY=lapBaseY, lapTilt=0;
+  const clock=new THREE.Clock(); const tgt=new THREE.Vector3();
+  const R=3.1, K=0.16, DAMP=0.74;
   function tick(){
-    const dt=Math.min(clock.getDelta(),0.033);
-    // pointer world pos
     ray.setFromCamera(ndc,cam); ray.ray.intersectPlane(plane,cw);
-    if(active){ if(hasLast){pmove.subVectors(cw,lastcw);} lastcw.copy(cw); hasLast=true; } else { pmove.set(0,0,0); }
-    const speed=pmove.length();
-    // push nearby boxes by pointer movement
-    if(active && speed>0.015){
-      for(const it of items){
-        const b=it.body; const dx=b.position.x-cw.x, dy=b.position.y-cw.y; const d=Math.hypot(dx,dy); const R=2.9;
-        if(d<R){ b.wakeUp(); const f=(1-d/R); const k=17;
-          b.velocity.x+=pmove.x*k*f; b.velocity.y+=Math.max(pmove.y,0)*k*f*0.6+f*0.6; b.velocity.z+=pmove.z*k*f;
-          b.angularVelocity.x+=(Math.random()-0.5)*f*2; b.angularVelocity.z+=(Math.random()-0.5)*f*2;
+    let energy=0;
+    for(const it of items){
+      tgt.set(0,0,0);
+      if(active){
+        const dx=it.home.x-cw.x, dy=it.home.y-cw.y; const d=Math.hypot(dx,dy);
+        if(d<R){ const f=(1-d/R); const dd=d||0.001;
+          tgt.y=f*0.55; tgt.x=(dx/dd)*f*0.3; tgt.z=f*0.35;
         }
       }
+      it.v.add(tgt.clone().sub(it.off).multiplyScalar(K)); it.v.multiplyScalar(DAMP); it.off.add(it.v);
+      it.mesh.position.set(it.home.x+it.off.x, it.home.y+it.off.y, it.home.z+it.off.z);
+      const rtx=it.off.z*0.22, rtz=-it.off.x*0.22;
+      it.rv.x+=(rtx-it.rot.x)*K; it.rv.x*=DAMP; it.rot.x+=it.rv.x;
+      it.rv.z+=(rtz-it.rot.z)*K; it.rv.z*=DAMP; it.rot.z+=it.rv.z;
+      it.mesh.rotation.set(it.rot.x,0,it.rot.z);
+      energy+=it.off.length();
     }
-    world.step(1/60, dt, 3);
-    // sync + respawn guard + energy
-    let energy=0;
-    for(const it of items){ const b=it.body;
-      if(b.position.y<-4 || Math.abs(b.position.x)>11 || Math.abs(b.position.z)>9){ b.position.copy(it.home); b.velocity.set(0,0,0); b.angularVelocity.set(0,0,0); b.quaternion.set(0,0,0,1);}
-      it.mesh.position.copy(b.position); it.mesh.quaternion.copy(b.quaternion);
-      energy+=b.velocity.length();
-    }
-    // laptop float toward cursor + bob
-    const t=clock.elapsedTime; const tY=lapBaseY+(active?0.55:0)+Math.sin(t*1.4)*0.12;
-    lapY+=(tY-lapY)*0.08; lap.position.y=lapY;
-    const ttilt=active?(ndc.x*0.16):0; lapTilt+=(ttilt-lapTilt)*0.06; lap.rotation.z=-lapTilt; lap.rotation.y=lapTilt*0.6;
-    // interaction glow
-    const g=Math.min(0.18+energy*0.06,0.95); glowEl.style.opacity=g.toFixed(2);
-    backGlow.intensity=Math.min(energy*1.4,16);
+    // laptop reacts only when cursor is near it
+    let lapTgt=0, tiltTgt=0;
+    if(active){ const dx=cw.x, dy=cw.y-lapBaseY; const d=Math.hypot(dx,dy); if(d<2.6){ const f=(1-d/2.6); lapTgt=f*0.45; tiltTgt=ndc.x*0.12*f; } }
+    lapS.v+=(lapTgt-lapS.off)*0.14; lapS.v*=0.76; lapS.off+=lapS.v;
+    lapS.tilt+=(tiltTgt-lapS.tilt)*0.08;
+    lap.position.y=lapBaseY+lapS.off; lap.rotation.z=-lapS.tilt; lap.rotation.y=lapS.tilt*0.5;
+    energy+=Math.abs(lapS.off)*2;
+    // bluish interaction glow behind boxes
+    const g=Math.min(0.14+energy*0.13,0.92); glowEl.style.opacity=g.toFixed(2);
+    backGlow.intensity=Math.min(energy*3.4,20);
     renderer.render(scene,cam);
     requestAnimationFrame(tick);
   }
