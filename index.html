@@ -46,8 +46,8 @@
 
   .layer{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px;will-change:transform,opacity}
   .hero-layer .kicker{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:22px}
-  .hero-layer h1{font-size:clamp(40px,7vw,92px);line-height:1.02;font-weight:400;max-width:14ch}
-  .hero-layer h1 em{font-style:italic;color:var(--accent)}
+  .hero-layer h1{font-family:'Inter',sans-serif;font-style:normal;font-size:clamp(38px,6.2vw,82px);line-height:1.05;font-weight:800;letter-spacing:-.03em;max-width:16ch;text-shadow:0 2px 28px rgba(243,241,234,.85),0 1px 2px rgba(243,241,234,.9)}
+  .hero-layer h1 em{font-style:normal;color:var(--accent)}
   .hero-layer p{max-width:520px;margin:26px auto 30px;color:var(--ink-2);font-size:18px}
   .hero-layer .cta{display:flex;gap:12px;justify-content:center}
   .s2-layer{opacity:0}
@@ -58,6 +58,8 @@
   .s2-layer .row .n{font-family:'Playfair Display',serif;font-style:italic;font-size:40px;color:var(--ink)}
   .s2-layer .row .l{font-size:13px;color:var(--ink-3);letter-spacing:.02em}
 
+  .glass{background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.42));backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border:1px solid rgba(255,255,255,.7);border-radius:28px;padding:54px 60px;max-width:760px;box-shadow:0 30px 70px rgba(23,24,43,.14),inset 0 1px 0 rgba(255,255,255,.8);}
+  @media(max-width:700px){.glass{padding:34px 26px}}
   .scrollcue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:3;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:8px}
   .scrollcue .m{width:22px;height:34px;border:1.5px solid var(--ink-3);border-radius:12px;position:relative;opacity:.6}
   .scrollcue .m::after{content:"";position:absolute;left:50%;top:7px;width:3px;height:6px;border-radius:2px;background:var(--ink-3);transform:translateX(-50%);animation:dot 1.6s infinite}
@@ -91,7 +93,7 @@
 
     <div class="layer hero-layer" id="heroLayer">
       <div class="kicker">eCommerce Logistics</div>
-      <h1 class="serif">Logistics, <em>built for the bold.</em></h1>
+      <h1>Logistics, <em>built for the bold.</em></h1>
       <p>One platform to ship, track, and scale across 25+ couriers — engineered for speed, scale, and simplicity.</p>
       <div class="cta">
         <button class="btn btn-primary">Try for free</button>
@@ -100,13 +102,15 @@
     </div>
 
     <div class="layer s2-layer" id="s2Layer">
-      <div class="kicker">One intelligent network</div>
-      <h2 class="serif">Every order, every courier —<br><em>organised in one place.</em></h2>
-      <p>Chaos becomes clarity. NimbusPost routes each shipment to the best carrier automatically, so your operations move as one.</p>
-      <div class="row">
-        <div><div class="n">25+</div><div class="l">Courier partners</div></div>
-        <div><div class="n">99.3%</div><div class="l">Delivery success</div></div>
-        <div><div class="n">100K+</div><div class="l">Brands shipping</div></div>
+      <div class="glass">
+        <div class="kicker">One intelligent network</div>
+        <h2 class="serif">Every order, every courier —<br><em>organised in one place.</em></h2>
+        <p>Chaos becomes clarity. NimbusPost routes each shipment to the best carrier automatically, so your operations move as one.</p>
+        <div class="row">
+          <div><div class="n">25+</div><div class="l">Courier partners</div></div>
+          <div><div class="n">99.3%</div><div class="l">Delivery success</div></div>
+          <div><div class="n">100K+</div><div class="l">Brands shipping</div></div>
+        </div>
       </div>
     </div>
 
