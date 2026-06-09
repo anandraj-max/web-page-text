@@ -612,6 +612,51 @@ window.loadNimbusLaptop=function(cb){
   add(box(8.6,0.32,4.6,matDesk),0,0,0);
   add(box(8.7,0.06,4.7,matEdge),0,-0.17,0);
   [[-4.0,-2.05],[4.0,-2.05],[-4.0,2.05],[4.0,2.05]].forEach(([x,z])=>add(box(0.22,3.3,0.22,matLeg),x,-1.8,z));
+  // ---- seated person (stylized, detail-oriented) ----
+  (function(){
+    const P=new THREE.Group();
+    const skin=M(0xd6a17e,0.75), sweater=M(0xc3b2ef,0.92), cuff=M(0xb4a1e8,0.9), pants=M(0xb07a3c,0.85), hair=M(0x271f1a,0.55), shoe=M(0x2a2a32,0.5), chairM=M(0xeef0f6,0.7);
+    function limb(ax,ay,az,bx2,by,bz,r,mat){const a=new THREE.Vector3(ax,ay,az),b=new THREE.Vector3(bx2,by,bz);const dir=new THREE.Vector3().subVectors(b,a);const len=dir.length();const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r*0.95,len,16),mat);m.castShadow=true;m.receiveShadow=true;m.position.copy(a).addScaledVector(dir,0.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.clone().normalize());P.add(m);return m;}
+    function ball(x,y,z,r,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(r,22,18),mat);m.castShadow=true;m.position.set(x,y,z);P.add(m);return m;}
+    function bx(w,h,d,x,y,z,mat,ry){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.castShadow=true;m.receiveShadow=true;m.position.set(x,y,z);if(ry)m.rotation.x=ry;P.add(m);return m;}
+    // chair
+    bx(1.5,0.14,1.4, 0,-0.92,3.05, chairM);
+    bx(1.4,1.75,0.16, 0,0.05,3.66, chairM);
+    limb(0,-0.99,3.05, 0,-2.3,3.05, 0.1, chairM);
+    bx(1.1,0.1,1.05, 0,-3.1,3.05, chairM);
+    // hips + torso (lean slightly forward)
+    bx(1.18,0.6,0.8, 0,-0.6,2.82, pants);
+    const torso=new THREE.Mesh(new THREE.BoxGeometry(1.22,1.55,0.74),sweater);torso.castShadow=true;torso.receiveShadow=true;torso.position.set(0,0.28,2.68);torso.rotation.x=0.17;P.add(torso);
+    ball(0,1.02,2.5,0.44,sweater);
+    // neck + head + hair
+    limb(0,1.0,2.55, 0,1.34,2.48,0.16,skin);
+    ball(0,1.56,2.44,0.4,skin);
+    const hc=ball(0,1.66,2.5,0.45,hair); hc.scale.set(1.02,0.82,1.04);
+    bx(0.55,0.4,0.42, 0,1.6,2.72, hair);
+    // shoulders
+    ball(-0.58,0.94,2.62,0.21,sweater); ball(0.58,0.94,2.62,0.21,sweater);
+    // left arm to keyboard
+    limb(-0.58,0.92,2.6, -0.74,0.36,2.02,0.17,sweater);
+    ball(-0.74,0.34,2.0,0.16,sweater);
+    limb(-0.74,0.34,2.0, -0.56,0.2,1.28,0.14,cuff);
+    ball(-0.53,0.19,1.22,0.16,skin);
+    // right arm to keyboard
+    limb(0.58,0.92,2.6, 0.75,0.36,2.02,0.17,sweater);
+    ball(0.75,0.34,2.0,0.16,sweater);
+    limb(0.75,0.34,2.0, 0.52,0.2,1.32,0.14,cuff);
+    ball(0.49,0.19,1.26,0.16,skin);
+    // thighs (seated, forward)
+    limb(-0.36,-0.6,2.6, -0.44,-0.72,1.55,0.28,pants);
+    limb(0.36,-0.6,2.6, 0.44,-0.72,1.55,0.28,pants);
+    ball(-0.44,-0.72,1.5,0.27,pants); ball(0.44,-0.72,1.5,0.27,pants);
+    // lower legs to floor
+    limb(-0.44,-0.72,1.55, -0.46,-2.9,1.72,0.2,pants);
+    limb(0.44,-0.72,1.55, 0.46,-2.9,1.72,0.2,pants);
+    // shoes
+    bx(0.34,0.2,0.62, -0.46,-3.02,1.46, shoe); bx(0.34,0.2,0.62, 0.46,-3.02,1.46, shoe);
+    P.position.set(0.15,0,0.3);
+    grp.add(P);
+  })();
 
   // ---- laptop ----
   const lap=new THREE.Group();
